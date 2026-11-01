@@ -19,6 +19,7 @@ const RECIPE_KEYWORDS: Record<string, string[]> = {
   "tomato-egg-fried-rice": ["fried rice", "egg rice"],
   "dal-tadka": ["dal tadka", "dal", "daal", "tadka"],
   poha: ["poha"],
+  "jhal-muri": ["jhal muri", "jhalmuri", "bhel", "bhelpuri", "chaat", "murmura chaat"],
   "pasta-pomodoro": ["pasta", "pomodoro", "spaghetti"],
   "paneer-bhurji": ["bhurji", "paneer bhurji"],
   "veg-hakka-noodles": ["noodles", "hakka", "chowmein", "chow mein"],
@@ -57,14 +58,18 @@ function esc(s: string) {
 }
 
 export function findIngredients(q: string): string[] {
-  const s = ` ${q.toLowerCase()} `;
+  let s = ` ${q.toLowerCase()} `;
   const found = new Set<string>();
-  for (const i of INGREDIENTS) {
-    if (i.staple) continue;
-    const names = [i.name.toLowerCase(), ...(i.aliases ?? [])];
-    const base = i.name.toLowerCase().split(" (")[0];
-    names.push(base, base.split(" / ")[0]);
-    if (names.some((n) => n && new RegExp(`[^a-z]${esc(n)}(e?s)?[^a-z]`).test(s))) found.add(i.id);
+  // longest names first, and consume what matched — so "puffed rice" isn't also read as "rice"
+  const candidates = INGREDIENTS.filter((i) => !i.staple)
+    .flatMap((i) => {
+      const base = i.name.toLowerCase().split(" (")[0];
+      return [i.name.toLowerCase(), base, base.split(" / ")[0], ...(i.aliases ?? [])].filter(Boolean).map((n) => ({ id: i.id, n }));
+    })
+    .sort((a, b) => b.n.length - a.n.length);
+  for (const { id, n } of candidates) {
+    const re = new RegExp(`([^a-z])${esc(n)}(e?s)?(?=[^a-z])`, "g");
+    if (re.test(s)) { found.add(id); s = s.replace(re, "$1 "); }
   }
   // common Hindi words
   const hindi: Record<string, string> = { tamatar: "tomato", pyaaz: "onion", pyaz: "onion", anda: "egg", ande: "egg", chawal: "rice", lehsun: "garlic", adrak: "ginger", gajar: "carrot", doodh: "milk", makhan: "butter", kheera: "cucumber", nimbu: "lemon", mirch: "green-chilli", aloo: "potato" };

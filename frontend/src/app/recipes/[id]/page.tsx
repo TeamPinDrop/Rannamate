@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { loadAiRecipes } from "@/lib/aiRecipes";
 import { motion } from "framer-motion";
 import { ArrowLeft, ChefHat, Clock, Flame, Heart, Users, Check, X, Repeat } from "lucide-react";
 import { RECIPE_BY_ID } from "@/lib/data/recipes";
@@ -13,9 +15,12 @@ import { matchFor } from "@/lib/recommend";
 
 export default function RecipePage() {
   const { id } = useParams<{ id: string }>();
-  const r = RECIPE_BY_ID[id];
+  const [ready, setReady] = useState(false);
+  useEffect(() => { loadAiRecipes(); setReady(true); }, []);
+  const r = ready || !id.startsWith("ai-") ? RECIPE_BY_ID[id] : undefined;
   const pantry = useStore((s) => s.pantry);
   const fav = useStore((s) => s.favourites.includes(id));
+  if (!r && !ready) return <div className="min-h-screen" />;
   if (!r) return <div className="mx-auto max-w-3xl px-4 pt-40 text-center text-forest">Recipe not found. <Link href="/discover" className="underline">Back to Discover</Link></div>;
   const have = new Set(pantry.map((p) => p.ingredientId));
   const m = matchFor(r, pantry);

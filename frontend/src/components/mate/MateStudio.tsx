@@ -6,7 +6,8 @@ import { Ear, Mic, MicOff, RotateCcw, Send, Settings2, Sparkles, Volume2, Volume
 import { MateAvatar, type AvatarMood, type AvatarState } from "./MateAvatar";
 import { CardView } from "./ChatCards";
 import { think } from "@/lib/mate/brain";
-import { parseTags } from "@/lib/mate/protocol";
+import { fromAi } from "@/lib/mate/fromAi";
+import { getAiRecipe, isAiRecipe, loadAiRecipes } from "@/lib/aiRecipes";
 import { GREETINGS, line, PERSONAS, VOICE_STYLE } from "@/lib/mate/persona";
 import type { ChatMessage, Lang, MateCard, MateTurn, Persona } from "@/lib/mate/types";
 import { useSpeechRecognition, useSpeechSynthesis } from "@/lib/voice";
@@ -33,9 +34,12 @@ function Typewriter({ text, onDone }: { text: string; onDone: () => void }) {
   useEffect(() => {
     setN(0);
     const step = Math.max(1, Math.round(text.length / 90));
-    const t = setInterval(() => setN((x) => { const y = Math.min(text.length, x + step); if (y >= text.length) { clearInterval(t); done.current(); } return y; }), 18);
+    const t = setInterval(() => setN((x) => Math.min(text.length, x + step)), 18);
     return () => clearInterval(t);
   }, [text]);
+  useEffect(() => {
+    if (n >= text.length && text.length) done.current();
+  }, [n, text.length]);
   return <>{text.slice(0, n)}<span className={n < text.length ? "ml-0.5 inline-block h-4 w-1.5 animate-pulse rounded-sm bg-cream/80 align-middle" : "hidden"} /></>;
 }
 
@@ -57,6 +61,7 @@ export function MateStudio() {
   const [input, setInput] = useState("");
   const [showSettings, setShowSettings] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -64,6 +69,7 @@ export function MateStudio() {
 
   // ---- restore + greet ----
   useEffect(() => {
+    loadAiRecipes();
     const prefs = load<{ persona?: Persona; lang?: Lang }>(PREF_KEY, {});
     if (prefs.persona) setPersona(prefs.persona);
     if (prefs.lang) setLang(prefs.lang);
@@ -93,7 +99,11 @@ export function MateStudio() {
 
   const recipe = recipeId ? RECIPE_BY_ID[recipeId] : null;
 
-  const applyTurn = useCallback((turn: MateTurn, source: "ai" | "offline") => {
+  /** Starts the voice first, then reveals the reply the moment it becomes audible — so face, text and voice stay in sync. */
+  const applyTurn = useCallback(async (turn: MateTurn, source: "ai" | "offline") => {
+    const voiceStarted = tts.speak(turn.text, { ...VOICE_STYLE[persona], persona });
+    await Promise.race([voiceStarted, new Promise((r) => setTimeout(r, 6000))]);
+    setBusy(false);
     const e = turn.effects;
     if (e.setRecipe !== undefined) setRecipeId(e.setRecipe);
     if (e.setStep !== undefined) setStep(e.setStep);
@@ -102,7 +112,6 @@ export function MateStudio() {
     const m: ChatMessage = { id: uid(), who: "mate", text: turn.text, cards: turn.cards, source, at: Date.now() };
     setMsgs((x) => [...x, m]);
     setTypingId(m.id);
-    tts.speak(turn.text, VOICE_STYLE[persona]);
   }, [persona, tts]);
 
   const send = useCallback(async (raw: string) => {
@@ -118,25 +127,32 @@ export function MateStudio() {
     const ctx = { recipeId, step, cooking, pantry: pantry.map((p) => p.ingredientId), persona, lang, allergies: profile.allergies, diets: profile.diets };
 
     if (ai?.live) {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 35_000);
       try {
         const res = await fetch("/api/mate", {
           method: "POST",
+          signal: ctrl.signal,
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...ctx, messages: history.map((m) => ({ who: m.who, text: m.text })) }),
+          body: JSON.stringify({ ...ctx, aiRecipe: isAiRecipe(recipeId) ? getAiRecipe(recipeId!) : null, messages: history.map((m) => ({ who: m.who, text: m.text })) }),
         });
-        if (res.ok) {
-          const data = (await res.json()) as { text: string };
-          const parsed = parseTags(data.text, { recipeId });
-          setBusy(false);
-          applyTurn({ text: parsed.text || "🙂", cards: parsed.cards, effects: parsed.effects, mood: "happy" }, "ai");
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && typeof data.reply === "string") {
+          setAiError(null);
+          await applyTurn(fromAi(data, recipeId), "ai");
           return;
         }
-      } catch { /* fall through to the offline brain */ }
+        setAiError(String(data?.error ?? `HTTP ${res.status}`));
+      } catch (e) {
+        setAiError(e instanceof DOMException && e.name === "AbortError" ? "Gemini didn't answer within 35 seconds" : "Couldn't reach the RANNAMATE server");
+      } finally {
+        clearTimeout(timer);
+      }
     }
     await new Promise((r) => setTimeout(r, 450 + Math.random() * 450));
-    const turn = think(text, ctx);
-    setBusy(false);
-    applyTurn(turn, "offline");
+    let turn: MateTurn;
+    try { turn = think(text, ctx); } catch { turn = { text: "Oops, I fumbled the spatula — try asking that another way?", cards: [], effects: {} }; }
+    await applyTurn(turn, "offline");
   }, [busy, msgs, recipeId, step, cooking, pantry, persona, lang, profile, ai, applyTurn]);
 
   const stt = useSpeechRecognition(send);
@@ -151,7 +167,7 @@ export function MateStudio() {
   const onTimerDone = useCallback((label: string) => {
     const t = lang === "hinglish" ? `⏰ ${label} ka time ho gaya! Check karo.` : `⏰ Time's up for ${label}! Go check it.`;
     setMsgs((x) => [...x, { id: uid(), who: "mate", text: t, source: "offline", at: Date.now() }]);
-    tts.speak(t, VOICE_STYLE[persona]);
+    tts.speak(t, { ...VOICE_STYLE[persona], persona });
   }, [lang, persona, tts]);
 
   const reset = () => {
@@ -160,7 +176,9 @@ export function MateStudio() {
     setMsgs([{ id: uid(), who: "mate", text: line(GREETINGS, persona, lang), at: Date.now() }]);
   };
 
-  const avatarState: AvatarState = stt.listening ? "listening" : busy ? "thinking" : tts.speaking || typingId ? "talking" : "idle";
+  // with a voice on, the mouth moves only while audio is actually playing
+  const voiceOn = tts.supported && !tts.muted;
+  const avatarState: AvatarState = stt.listening ? "listening" : busy ? "thinking" : tts.speaking || (!voiceOn && typingId) ? "talking" : "idle";
   const status = stt.listening ? (stt.interim ? `“${stt.interim}”` : lang === "hinglish" ? "Sun raha hoon… bolo!" : "I'm listening… go ahead!") : busy ? (lang === "hinglish" ? "Soch raha hoon… 🤔" : "Cooking up an answer… 🤔") : tts.speaking ? (lang === "hinglish" ? "Bol raha hoon…" : "Talking…") : cooking && recipe ? `Cooking ${recipe.name} · step ${step + 1}/${recipe.steps.length}` : lang === "hinglish" ? "Mic dabao ya type karo" : "Tap the mic or type a message";
 
   const prompts = useMemo(() => {
@@ -186,8 +204,8 @@ export function MateStudio() {
         {/* ---------- left: Mate stage ---------- */}
         <aside className="glass-dark relative flex flex-col items-center rounded-[2rem] p-4 lg:p-5">
           <div className="flex w-full items-center justify-between">
-            <span className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${ai?.live ? "bg-[#2E7D5B] text-white" : "bg-cream/15 text-cream/80"}`} title={ai?.live ? "Answers come from a generative AI model" : "Add an API key in .env.local for live AI"}>
-              {ai?.live ? <><Zap className="h-3 w-3" /> Live AI · {ai.provider}</> : ai ? <><Sparkles className="h-3 w-3" /> Offline brain</> : "…"}
+            <span className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${ai?.live ? "bg-[#2E7D5B] text-white" : "bg-cream/15 text-cream/80"}`} title={ai?.live ? "RANNAMATE AI is online — answers are generated live" : "Add an API key in .env.local for live AI"}>
+              {ai?.live ? <><Zap className="h-3 w-3" /> RANNAMATE AI</> : ai ? <><Sparkles className="h-3 w-3" /> Offline brain</> : "…"}
             </span>
             <button onClick={() => setShowSettings((s) => !s)} className="rounded-full p-2 hover:bg-cream/10 lg:hidden" aria-label="Mate settings" aria-expanded={showSettings}><Settings2 className="h-4 w-4" /></button>
           </div>
@@ -248,6 +266,16 @@ export function MateStudio() {
                 )}
               </div>
             </div>
+            {tts.cloudVoice && (
+              <div>
+                <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-cream/60">Mate&apos;s voice</p>
+                <div className="grid grid-cols-2 gap-1 rounded-full bg-black/20 p-1 text-[11px] font-bold">
+                  <button onClick={() => tts.setVoiceSource(true)} aria-pressed={tts.useCloud} className={`rounded-full px-3 py-1.5 ${tts.useCloud ? "bg-cream text-forest" : "text-cream/80"}`}>🎙️ My voice</button>
+                  <button onClick={() => tts.setVoiceSource(false)} aria-pressed={!tts.useCloud} className={`rounded-full px-3 py-1.5 ${!tts.useCloud ? "bg-cream text-forest" : "text-cream/80"}`}>Browser voice</button>
+                </div>
+                {tts.voiceError && tts.useCloud && <p className="mt-1.5 text-[11px] text-cream/60">Voice service: {tts.voiceError.slice(0, 90)} — using the browser voice.</p>}
+              </div>
+            )}
             {handsFree && <p className="-mt-2 text-[11px] text-cream/60">Hands-free on — just talk. Say “next”, “repeat” or “start timer” while cooking.</p>}
           </div>
         </aside>
@@ -291,6 +319,11 @@ export function MateStudio() {
             )}
           </div>
 
+          {aiError && (
+            <p className="mx-3 mb-0 mt-2 rounded-2xl bg-burgundy/40 px-3 py-2 text-[12px] text-cream-50">
+              Live AI error: <span className="opacity-80">{aiError.slice(0, 160)}</span> — answering with my offline brain for now. Open <a href="/api/mate/check" target="_blank" className="underline">/api/mate/check</a> to diagnose.
+            </p>
+          )}
           <div className="border-t border-cream/10 p-3">
             <div className="no-scrollbar mb-2.5 flex gap-1.5 overflow-x-auto">
               <AnimatePresence mode="popLayout">

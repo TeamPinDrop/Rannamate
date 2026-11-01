@@ -1,6 +1,7 @@
 "use client";
 import { useSyncExternalStore } from "react";
 import type { Filters, MealPlan, PantryItem, Profile } from "./types";
+import { loadAiRecipes } from "./aiRecipes";
 
 export interface AppState {
   pantry: PantryItem[];
@@ -31,6 +32,7 @@ const listeners = new Set<() => void>();
 function hydrate() {
   if (hydrated || typeof window === "undefined") return;
   hydrated = true;
+  loadAiRecipes();
   try {
     const raw = window.localStorage.getItem(KEY);
     if (raw) state = { ...DEFAULT_STATE, ...JSON.parse(raw) };

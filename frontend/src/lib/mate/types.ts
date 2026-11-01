@@ -4,6 +4,7 @@ export type Lang = "en" | "hinglish";
 export type MateCard =
   | { type: "recipes"; ids: string[]; matches?: Record<string, number> }
   | { type: "recipe"; id: string }
+  | { type: "created"; id: string }
   | { type: "step"; id: string; index: number }
   | { type: "timer"; seconds: number; label: string }
   | { type: "swap"; from: string; options: string[] }

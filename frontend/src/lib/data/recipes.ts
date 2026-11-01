@@ -563,5 +563,46 @@ export const RECIPES: Recipe[] = [
   },
 ];
 
+RECIPES.push({
+  id: "jhal-muri",
+  name: "Jhal Muri",
+  tagline: "Kolkata's tangy, crunchy puffed-rice street snack",
+  emoji: "🥗",
+  palette: ["#F4C95D", "#B5651D"],
+  cuisine: "Indian",
+  moods: ["quick", "light", "spicy"],
+  diets: ["vegetarian", "vegan", "gluten-free", "dairy-free"],
+  allergens: ["nuts"],
+  difficulty: "Beginner",
+  prepMin: 10, cookMin: 0, servings: 2,
+  equipment: [[]],
+  ingredients: [
+    { ingredientId: "puffed-rice", quantity: 3, unit: "cup" },
+    { ingredientId: "onion", quantity: 1, unit: "pcs", note: "finely chopped" },
+    { ingredientId: "cucumber", quantity: 0.5, unit: "pcs", note: "finely diced" },
+    { ingredientId: "green-chilli", quantity: 1, unit: "pcs", note: "minced", optional: true },
+    { ingredientId: "tomato", quantity: 0.5, unit: "pcs", note: "deseeded, diced", optional: true },
+    { ingredientId: "coriander", quantity: 2, unit: "tbsp", optional: true },
+    { ingredientId: "peanuts", quantity: 2, unit: "tbsp", note: "roasted", optional: true },
+    { ingredientId: "sev", quantity: 2, unit: "tbsp", optional: true },
+    { ingredientId: "lemon", quantity: 0.5, unit: "pcs", optional: true },
+    { ingredientId: "oil", quantity: 1, unit: "tsp", note: "mustard oil is traditional" },
+    { ingredientId: "chilli-powder", quantity: 0.25, unit: "tsp" },
+    { ingredientId: "salt", quantity: 0.5, unit: "tsp" },
+  ],
+  steps: [
+    { text: "Chop the onion, cucumber, green chilli and tomato very finely so every bite gets a bit of everything." },
+    { text: "If the puffed rice isn't crisp, dry-roast it in a pan for 2 minutes and let it cool.", timer: 120 },
+    { text: "In a big bowl, toss the onion, cucumber, chilli, tomato and coriander with salt, chilli powder and the oil." },
+    { text: "Add the puffed rice and peanuts and toss quickly with your hands or two spoons." },
+    { text: "Squeeze over lemon, top with sev and serve immediately — it goes soggy within minutes.", tip: "Mix it right before eating, never in advance." },
+  ],
+  substitutions: [
+    { ingredientId: "peanuts", options: ["roasted chana dal", "skip for a nut-free version"] },
+    { ingredientId: "lemon", options: ["a pinch of amchur", "tamarind chutney (bhel-style)"] },
+  ],
+  weather: "any",
+});
+
 export const RECIPE_BY_ID: Record<string, Recipe> = Object.fromEntries(RECIPES.map((r) => [r.id, r]));
 export const totalTime = (r: Recipe) => r.prepMin + r.cookMin;

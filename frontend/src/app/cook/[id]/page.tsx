@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { loadAiRecipes } from "@/lib/aiRecipes";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronLeft, ChevronRight, Heart, ListChecks, MessageCircle, Pause, Play, RotateCcw, Timer, Volume2, X } from "lucide-react";
 import { RECIPE_BY_ID } from "@/lib/data/recipes";
@@ -16,7 +17,9 @@ const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${Str
 
 export default function CookPage() {
   const { id } = useParams<{ id: string }>();
-  const r = RECIPE_BY_ID[id];
+  const [ready, setReady] = useState(false);
+  useEffect(() => { loadAiRecipes(); setReady(true); }, []);
+  const r = ready || !id.startsWith("ai-") ? RECIPE_BY_ID[id] : undefined;
   const [step, setStep] = useState(0);
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [panel, setPanel] = useState<"mate" | "list" | null>(null);
@@ -76,6 +79,7 @@ export default function CookPage() {
     return () => window.removeEventListener("keydown", on);
   }, [go, remaining]);
 
+  if ((!r || !s) && !ready) return <div className="min-h-screen bg-forest" />;
   if (!r || !s) return <div className="px-4 pt-40 text-center text-forest">Recipe not found. <Link href="/discover" className="underline">Back</Link></div>;
 
   const progress = (step + 1) / r.steps.length;

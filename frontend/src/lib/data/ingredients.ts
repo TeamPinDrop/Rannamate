@@ -36,6 +36,8 @@ export const INGREDIENTS: Ingredient[] = [
   { id: "oats", name: "Oats", emoji: "🥣", category: "Grains", defaultUnit: "cup" },
   { id: "flour", name: "Wheat flour", emoji: "🌾", category: "Grains", defaultUnit: "cup", aliases: ["atta"] },
   { id: "tortilla", name: "Tortilla", emoji: "🫓", category: "Grains", defaultUnit: "pcs", aliases: ["roti", "wrap"] },
+  { id: "puffed-rice", name: "Puffed rice", emoji: "🍚", category: "Grains", defaultUnit: "cup", aliases: ["murmura", "muri", "kurmura", "mamra", "puffed rice", "murmure"] },
+  { id: "sev", name: "Sev / bhujia", emoji: "🥨", category: "Other", defaultUnit: "tbsp", aliases: ["bhujia", "namkeen"] },
   { id: "poha", name: "Poha (flattened rice)", emoji: "🍚", category: "Grains", defaultUnit: "cup" },
   // Rice & pulses
   { id: "rice", name: "Rice", emoji: "🍚", category: "Rice & Pulses", defaultUnit: "g" },

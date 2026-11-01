@@ -102,8 +102,8 @@ export function MateAvatar({ state, mood = "happy", persona, size = 220 }: { sta
         {/* eyes with blink */}
         {[78, 122].map((x) => (
           <motion.g key={x} animate={{ scaleY: [1, 1, 0.1, 1] }} transition={{ duration: 4, times: [0, 0.92, 0.95, 1], repeat: Infinity, delay: x === 78 ? 0 : 0.02 }} style={{ originX: `${x}px`, originY: "118px" }}>
-            <motion.ellipse cx={x} rx={state === "listening" ? 8 : 7} ry={state === "listening" ? 10 : 9} fill="#2B1410" animate={{ cy: eyeY, cx: x + eyeX }} />
-            <motion.circle r="2.6" fill="#fff" animate={{ cx: x + 2 + eyeX, cy: eyeY - 3 }} />
+            <motion.ellipse cx={x + eyeX} cy={eyeY} rx={state === "listening" ? 8 : 7} ry={state === "listening" ? 10 : 9} fill="#2B1410" initial={false} animate={{ cy: eyeY, cx: x + eyeX }} />
+            <motion.circle cx={x + 2 + eyeX} cy={eyeY - 3} r="2.6" fill="#fff" initial={false} animate={{ cx: x + 2 + eyeX, cy: eyeY - 3 }} />
           </motion.g>
         ))}
 
@@ -118,7 +118,7 @@ export function MateAvatar({ state, mood = "happy", persona, size = 220 }: { sta
 
         {/* mouth */}
         {state === "talking" ? (
-          <motion.ellipse cx="100" cy="160" rx="13" fill="#6C151E" animate={{ ry: [3, 9, 5, 10, 4] }} transition={{ duration: 0.55, repeat: Infinity }} />
+          <motion.ellipse cx="100" cy="160" rx="13" ry="5" fill="#6C151E" animate={{ ry: [3, 9, 5, 10, 4] }} transition={{ duration: 0.55, repeat: Infinity }} />
         ) : state === "thinking" ? (
           <ellipse cx="108" cy="160" rx="6" ry="4.5" fill="#6C151E" />
         ) : state === "listening" ? (

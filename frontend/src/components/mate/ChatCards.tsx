@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeftRight, ChefHat, ChevronLeft, ChevronRight, Clock, ExternalLink, Heart, Pause, Play, RotateCcw, Timer } from "lucide-react";
+import { ArrowLeftRight, Check, ChefHat, ChevronLeft, ChevronRight, Clock, ExternalLink, Heart, Pause, Play, RotateCcw, Timer } from "lucide-react";
 import { RECIPE_BY_ID } from "@/lib/data/recipes";
 import { ingredient } from "@/lib/data/ingredients";
 import { actions, useStore } from "@/lib/store";
@@ -15,10 +15,49 @@ const nice = (n: number) => (Number.isInteger(n) ? String(n) : n < 1 ? n.toFixed
 
 function Dish({ id, className = "" }: { id: string; className?: string }) {
   const r = RECIPE_BY_ID[id];
+  if (!r) return null;
   return (
     <div className={`flex items-center justify-center ${className}`} style={{ background: `radial-gradient(circle at 30% 25%, ${r.palette[0]}, ${r.palette[1]} 80%)` }}>
       <span className="drop-shadow-[0_6px_8px_rgba(0,0,0,0.35)]">{r.emoji}</span>
     </div>
+  );
+}
+
+function CreatedCard({ id, onSend }: { id: string; onSend: Send }) {
+  const r = RECIPE_BY_ID[id];
+  const pantry = useStore((s) => s.pantry);
+  const fav = useStore((s) => s.favourites.includes(id));
+  if (!r) return null;
+  const have = new Set(pantry.map((p) => p.ingredientId));
+  return (
+    <motion.div initial={{ opacity: 0, y: 20, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.15, type: "spring", stiffness: 200, damping: 20 }} className="relative max-w-lg overflow-hidden rounded-[1.75rem] border border-cream/30 bg-gradient-to-br from-cream/20 via-cream/10 to-transparent">
+      <motion.div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#F2B33D]/30 blur-2xl" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 4, repeat: Infinity }} />
+      <div className="relative flex gap-3 p-3.5">
+        <Dish id={id} className="h-20 w-20 shrink-0 rounded-2xl text-4xl" />
+        <div className="min-w-0">
+          <span className="inline-flex items-center gap-1 rounded-full bg-cream px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-burgundy">✨ Created by Mate</span>
+          <p className="mt-1 font-display text-xl font-semibold leading-tight text-cream-50">{r.name}</p>
+          <p className="text-[12px] text-cream/75">{r.tagline}</p>
+          <p className="mt-1 text-[11px] text-cream/60">{r.prepMin + r.cookMin} min · serves {r.servings} · {r.steps.length} steps · {r.cuisine}</p>
+        </div>
+      </div>
+      <div className="relative flex flex-wrap gap-1.5 px-3.5">
+        {r.ingredients.map((i) => {
+          const ing = ingredient(i.ingredientId);
+          const ok = have.has(i.ingredientId);
+          return (
+            <span key={i.ingredientId} className={`flex items-center gap-1 rounded-full px-2 py-1 text-[11px] ${ok ? "bg-[#2E7D5B]/60 text-white" : i.optional ? "bg-cream/5 text-cream/60" : "bg-cream/15 text-cream-50"}`} title={`${i.quantity} ${i.unit}${i.note ? ` · ${i.note}` : ""}`}>
+              {ing.emoji} {ing.name}{i.optional && " (opt.)"}{ok && <Check className="h-3 w-3" />}
+            </span>
+          );
+        })}
+      </div>
+      <div className="relative flex flex-wrap gap-1.5 p-3.5">
+        <button onClick={() => onSend(`Let's cook ${r.name}`)} className="flex items-center gap-1 rounded-full bg-cream px-3 py-1.5 text-[12px] font-bold text-burgundy"><ChefHat className="h-3.5 w-3.5" /> Start cook-along</button>
+        <button onClick={() => actions.toggleFavourite(id)} className="flex items-center gap-1 rounded-full bg-cream/15 px-3 py-1.5 text-[12px] font-bold text-cream-50" aria-pressed={fav}><Heart className={`h-3.5 w-3.5 ${fav ? "fill-cream" : ""}`} /> {fav ? "Saved" : "Save"}</button>
+        <Link href={`/recipes/${id}`} className="flex items-center gap-1 rounded-full bg-cream/15 px-3 py-1.5 text-[12px] font-bold text-cream-50"><ExternalLink className="h-3.5 w-3.5" /> Full recipe</Link>
+      </div>
+    </motion.div>
   );
 }
 
@@ -159,9 +198,12 @@ function IngredientsCard({ id, servings }: { id: string; servings: number }) {
 }
 
 export function CardView({ card, onSend, onTimerDone }: { card: MateCard; onSend: Send; onTimerDone: (label: string) => void }) {
+  if ("id" in card && !RECIPE_BY_ID[card.id]) return null;
+  if (card.type === "recipes" && !card.ids.every((x) => RECIPE_BY_ID[x])) return null;
   switch (card.type) {
     case "recipes": return <RecipesCard ids={card.ids} matches={card.matches} onSend={onSend} />;
     case "recipe": return <RecipeCard id={card.id} onSend={onSend} />;
+    case "created": return <CreatedCard id={card.id} onSend={onSend} />;
     case "step": return <StepCard id={card.id} index={card.index} onSend={onSend} />;
     case "timer": return <TimerCard seconds={card.seconds} label={card.label} onDone={onTimerDone} />;
     case "swap": return <SwapCard from={card.from} options={card.options} />;

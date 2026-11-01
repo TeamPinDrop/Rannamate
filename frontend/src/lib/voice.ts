@@ -63,22 +63,41 @@ export function useSpeechRecognition(onFinal: (text: string) => void) {
   return { supported, listening, interim, error, start, stop };
 }
 
+const clean = (raw: string) =>
+  raw
+    .replace(/\[\[[^\]]*\]\]/g, "")
+    .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+
+/**
+ * Speaks with the owner's cloned voice (ElevenLabs via /api/mate/speak) when it's
+ * configured, and falls back to the browser's built-in voice otherwise.
+ */
 export function useSpeechSynthesis() {
   const [supported, setSupported] = useState(false);
   const [muted, setMuted] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const [cloudVoice, setCloudVoice] = useState(false); // configured on the server
+  const [useCloud, setUseCloud] = useState(true); // user preference
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const seq = useRef(0);
 
-  useEffect(() => setSupported(typeof window !== "undefined" && "speechSynthesis" in window), []);
+  useEffect(() => {
+    setSupported(typeof window !== "undefined" && ("speechSynthesis" in window || "Audio" in window));
+    try { setUseCloud(localStorage.getItem("rannamate:voice") !== "browser"); } catch { /* ignore */ }
+    fetch("/api/mate/speak").then((r) => r.json()).then((d) => setCloudVoice(!!d.enabled)).catch(() => setCloudVoice(false));
+  }, []);
 
-  const speak = useCallback((raw: string, opts: { rate?: number; pitch?: number } = {}) => {
-    if (!supported || muted) return;
-    const text = raw
-      .replace(/\[\[[^\]]*\]\]/g, "")
-      .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu, "")
-      .replace(/\s{2,}/g, " ")
-      .trim();
-    if (!text) return;
-    window.speechSynthesis.cancel();
+  const stopAll = useCallback(() => {
+    seq.current++;
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current.src = ""; audioRef.current = null; }
+    if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
+  }, []);
+
+  const browserSpeak = useCallback((text: string, opts: { rate?: number; pitch?: number }) => {
+    if (!("speechSynthesis" in window)) { setSpeaking(false); return; }
     const u = new SpeechSynthesisUtterance(text);
     u.lang = "en-IN";
     u.rate = opts.rate ?? 1;
@@ -90,15 +109,63 @@ export function useSpeechSynthesis() {
     u.onend = () => setSpeaking(false);
     u.onerror = () => setSpeaking(false);
     window.speechSynthesis.speak(u);
-  }, [supported, muted]);
+  }, []);
 
-  const cancel = useCallback(() => { if (supported) window.speechSynthesis.cancel(); setSpeaking(false); }, [supported]);
-  const pause = useCallback(() => { if (supported) window.speechSynthesis.pause(); }, [supported]);
-  const resume = useCallback(() => { if (supported) window.speechSynthesis.resume(); }, [supported]);
+  /**
+   * Speaks `raw`. Resolves as soon as audio is actually audible (or immediately when
+   * falling back / muted), so the UI can reveal text and animate the face in sync.
+   */
+  const speak = useCallback((raw: string, opts: { rate?: number; pitch?: number; persona?: string } = {}): Promise<void> => {
+    if (!supported || muted) return Promise.resolve();
+    const text = clean(raw);
+    if (!text) return Promise.resolve();
+    stopAll();
+    const my = seq.current;
+
+    if (cloudVoice && useCloud) {
+      return new Promise<void>((resolve) => {
+        let settled = false;
+        const settle = () => { if (!settled) { settled = true; resolve(); } };
+        const fallback = (why: string) => {
+          if (my !== seq.current) return settle();
+          if (audioRef.current) { audioRef.current.pause(); audioRef.current.src = ""; audioRef.current = null; }
+          setVoiceError(why);
+          browserSpeak(text, opts);
+          settle();
+        };
+        // Streamed MP3: the <audio> element starts playing while the rest is still being generated
+        // unique &n= so the browser never waits on (or reuses) an earlier request for the same sentence
+        const a = new Audio(`/api/mate/speak?persona=${encodeURIComponent(opts.persona ?? "masala")}&n=${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}&text=${encodeURIComponent(text)}`);
+        audioRef.current = a;
+        a.preload = "auto";
+        a.playbackRate = Math.min(1.15, Math.max(0.9, opts.rate ?? 1));
+        const slow = setTimeout(() => { if (!settled) fallback("voice took too long to start"); }, 9000);
+        a.onplaying = () => { if (my !== seq.current) return; clearTimeout(slow); setSpeaking(true); setVoiceError(null); settle(); };
+        a.onended = () => { if (my === seq.current) setSpeaking(false); };
+        a.onerror = () => { clearTimeout(slow); if (my === seq.current) setSpeaking(false); if (!settled) fallback("voice service unavailable"); };
+        a.play().catch((e: unknown) => {
+          clearTimeout(slow);
+          // Autoplay blocked (no recent click) or stream failed — use the browser voice instead
+          fallback(e instanceof DOMException && e.name === "NotAllowedError" ? "browser blocked autoplay — click anywhere once" : "voice service unavailable");
+        });
+      });
+    }
+    browserSpeak(text, opts);
+    return Promise.resolve();
+  }, [supported, muted, cloudVoice, useCloud, stopAll, browserSpeak]);
+
+  const cancel = useCallback(() => { stopAll(); setSpeaking(false); }, [stopAll]);
+  const pause = useCallback(() => { audioRef.current?.pause(); if ("speechSynthesis" in window) window.speechSynthesis.pause(); }, []);
+  const resume = useCallback(() => { audioRef.current?.play().catch(() => {}); if ("speechSynthesis" in window) window.speechSynthesis.resume(); }, []);
 
   const toggleMute = useCallback(() => {
-    setMuted((m) => { if (!m && supported) window.speechSynthesis.cancel(); return !m; });
-  }, [supported]);
+    setMuted((m) => { if (!m) { stopAll(); setSpeaking(false); } return !m; });
+  }, [stopAll]);
 
-  return { supported, muted, speaking, speak, cancel, pause, resume, toggleMute };
+  const setVoiceSource = useCallback((cloud: boolean) => {
+    setUseCloud(cloud);
+    try { localStorage.setItem("rannamate:voice", cloud ? "cloud" : "browser"); } catch { /* ignore */ }
+  }, []);
+
+  return { supported, muted, speaking, speak, cancel, pause, resume, toggleMute, cloudVoice, useCloud, setVoiceSource, voiceError };
 }
