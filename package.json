@@ -1,0 +1,11 @@
+{
+  "name": "rannamate",
+  "private": true,
+  "description": "RANNAMATE monorepo root — run `npm run dev` here or inside frontend/",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "start": "npm --prefix frontend run start",
+    "install:frontend": "npm --prefix frontend install"
+  }
+}
