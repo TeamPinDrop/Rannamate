@@ -4,6 +4,8 @@ import { Navbar } from "@/components/Navbar";
 import { Ambient } from "@/components/Ambient";
 import { Preloader } from "@/components/Preloader";
 import { Footer } from "@/components/Footer";
+import { AuthProvider } from "@/lib/auth/AuthProvider";
+import { IntroGate } from "@/components/auth/IntroGate";
 
 export const metadata: Metadata = {
   title: "RANNAMATE — Your Kitchen. Your Mood. Your Mate.",
@@ -27,9 +29,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-sans min-h-screen">
         <Preloader />
         <Ambient />
-        <Navbar />
-        <main className="relative z-10">{children}</main>
-        <Footer />
+        <AuthProvider>
+          <IntroGate />
+          <Navbar />
+          <main className="relative z-10">{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

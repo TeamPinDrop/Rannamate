@@ -6,12 +6,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Menu, UserRound, X } from "lucide-react";
 import { LogoMark, Wordmark } from "./Logo";
 import { useStore } from "@/lib/store";
+import { useAuth } from "@/lib/auth/AuthProvider";
+import { isAuthRoute, signInHref } from "@/lib/auth/routes";
 
 const LINKS = [
   { href: "/", label: "Home" },
   { href: "/discover", label: "Discover Recipes" },
   { href: "/kitchen", label: "My Kitchen" },
-  { href: "/planner", label: "Meal Planner" },
+  { href: "/tastory", label: "Tastory" },
   { href: "/mate", label: "Cooking Mate" },
 ];
 
@@ -20,6 +22,7 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pantryCount = useStore((s) => s.pantry.length);
+  const { status, user } = useAuth();
 
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 20);
@@ -30,6 +33,9 @@ export function Navbar() {
   useEffect(() => setOpen(false), [path]);
 
   if (path?.startsWith("/cook/")) return null; // distraction-free cooking mode
+  if (isAuthRoute(path)) return null; // the sign-in pages are their own full-screen experience
+  const signedIn = status === "signed-in" && user;
+  const firstName = signedIn ? (user.profile.displayName || user.email).split(/[\s@]/)[0] : "";
   const dark = path === "/mate";
 
   return (
@@ -70,9 +76,16 @@ export function Navbar() {
           })}
         </ul>
         <div className="relative flex items-center gap-2">
-          <Link href="/profile" className="flex items-center gap-2 rounded-full bg-burgundy px-4 py-2 text-[13px] font-semibold text-cream-50 hover:bg-burgundy-700">
-            <UserRound className="h-4 w-4" /> <span className="hidden sm:inline">Profile</span>
-          </Link>
+          {signedIn ? (
+            <Link href="/profile" aria-label={`Your profile (${user.email})`} className="flex items-center gap-2 rounded-full bg-burgundy py-1.5 pl-1.5 pr-4 text-[13px] font-semibold text-cream-50 hover:bg-burgundy-700">
+              <span aria-hidden className="grid h-7 w-7 place-items-center rounded-full bg-cream-50 font-display text-[13px] font-bold text-burgundy">{firstName.charAt(0).toUpperCase()}</span>
+              <span className="hidden max-w-[7rem] truncate sm:inline">{firstName}</span>
+            </Link>
+          ) : (
+            <Link href={status === "signed-out" ? signInHref(path) : "/profile"} className="flex items-center gap-2 rounded-full bg-burgundy px-4 py-2 text-[13px] font-semibold text-cream-50 hover:bg-burgundy-700">
+              <UserRound className="h-4 w-4" /> <span className="hidden sm:inline">{status === "signed-out" ? "Sign In" : "Profile"}</span>
+            </Link>
+          )}
           <button className={`rounded-full p-2 lg:hidden ${dark ? "text-cream" : "text-forest"}`} aria-label="Open menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>

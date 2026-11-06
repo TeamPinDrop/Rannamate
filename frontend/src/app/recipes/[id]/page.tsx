@@ -9,7 +9,6 @@ import { RECIPE_BY_ID } from "@/lib/data/recipes";
 import { ingredient } from "@/lib/data/ingredients";
 import { DishArt } from "@/components/ui/DishArt";
 import { MatchRing } from "@/components/ui/MatchRing";
-import { AddToPlan } from "@/components/AddToPlan";
 import { actions, useStore } from "@/lib/store";
 import { matchFor } from "@/lib/recommend";
 
@@ -53,7 +52,6 @@ export default function RecipePage() {
             <Link href={`/cook/${r.id}`} className="btn-primary !px-7 !py-3.5 text-base"><ChefHat className="h-5 w-5" /> Start Cooking</Link>
             <button onClick={() => actions.toggleFavourite(r.id)} className="btn-ghost" aria-pressed={fav}><Heart className={`h-4 w-4 ${fav ? "fill-burgundy text-burgundy" : ""}`} /> {fav ? "Saved" : "Save"}</button>
           </div>
-          <div className="mt-4"><AddToPlan recipeId={r.id} /></div>
         </motion.div>
       </div>
 

@@ -183,7 +183,7 @@ function PhotoEntry() {
         </div>
       )}
       <p className="mt-4 text-xs text-forest/60">
-        Photo recognition runs in the AI service via the backend (<code>POST /api/vision/detect</code>). Until those services are running, this shows an honest &ldquo;unavailable&rdquo; message — use manual entry instead.
+        Photo recognition runs in the AI service via the backend (<code>POST /api/v1/scanner/ingredients</code>). Until those services are running, this shows an honest &ldquo;unavailable&rdquo; message — use manual entry instead.
       </p>
     </div>
   );

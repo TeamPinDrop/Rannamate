@@ -1,6 +1,6 @@
 "use client";
 import { useSyncExternalStore } from "react";
-import type { Filters, MealPlan, PantryItem, Profile } from "./types";
+import type { Filters, PantryItem, Profile } from "./types";
 import { loadAiRecipes } from "./aiRecipes";
 
 export interface AppState {
@@ -9,7 +9,6 @@ export interface AppState {
   profile: Profile;
   favourites: string[];
   history: { recipeId: string; at: number }[];
-  plan: MealPlan;
 }
 
 const KEY = "rannamate:v1";
@@ -22,7 +21,6 @@ const DEFAULT_STATE: AppState = {
   profile: { name: "", allergies: [], diets: [] },
   favourites: [],
   history: [],
-  plan: {},
 };
 
 let state: AppState = DEFAULT_STATE;
@@ -35,7 +33,11 @@ function hydrate() {
   loadAiRecipes();
   try {
     const raw = window.localStorage.getItem(KEY);
-    if (raw) state = { ...DEFAULT_STATE, ...JSON.parse(raw) };
+    if (raw) {
+      const { plan: _oldPlan, ...saved } = JSON.parse(raw); // the retired Meal Planner's data is no longer kept
+      void _oldPlan;
+      state = { ...DEFAULT_STATE, ...saved };
+    }
   } catch {
     /* storage unavailable — keep in-memory defaults */
   }
@@ -65,6 +67,8 @@ function subscribe(l: () => void) {
   listeners.add(l);
   return () => listeners.delete(l);
 }
+/** for non-React code (e.g. syncing the signed-in profile to the server) */
+export const subscribeStore = (l: () => void) => { const off = subscribe(l); return () => { off(); }; };
 
 /** Server renders with defaults; the client hydrates from localStorage after mount. */
 export function useStore<T>(selector: (s: AppState) => T): T {
@@ -117,16 +121,5 @@ export const actions = {
   },
   logCooked(recipeId: string) {
     setState((s) => ({ ...s, history: [{ recipeId, at: Date.now() }, ...s.history].slice(0, 50) }));
-  },
-  setMeal(day: keyof MealPlan, slot: "breakfast" | "lunch" | "dinner", recipeId: string | null) {
-    setState((s) => {
-      const d = { ...(s.plan[day] ?? {}) };
-      if (recipeId) d[slot] = recipeId;
-      else delete d[slot];
-      return { ...s, plan: { ...s.plan, [day]: d } };
-    });
-  },
-  clearPlan() {
-    setState((s) => ({ ...s, plan: {} }));
   },
 };

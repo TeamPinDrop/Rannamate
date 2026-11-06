@@ -1,10 +1,11 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { LogoMark, Wordmark } from "./Logo";
+import { isAuthRoute } from "@/lib/auth/routes";
 
 export function Footer() {
   const path = usePathname();
-  if (path?.startsWith("/cook/") || path === "/mate") return null;
+  if (path?.startsWith("/cook/") || path === "/mate" || isAuthRoute(path)) return null;
   return (
     <footer className="relative z-10 mx-auto max-w-6xl px-4 pb-10 pt-6 sm:px-6">
       <div className="glass flex flex-col items-center justify-between gap-3 rounded-3xl px-6 py-5 text-sm text-forest/80 sm:flex-row">

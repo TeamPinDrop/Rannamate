@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+# private photo storage for the local storage provider — never commit user photos
+storage/
+*.tsbuildinfo

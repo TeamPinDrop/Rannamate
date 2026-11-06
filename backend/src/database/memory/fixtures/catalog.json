@@ -1,0 +1,2595 @@
+{
+ "_note": "DEVELOPMENT FIXTURES ONLY — copied from frontend/src/lib/data by `npm run fixtures:sync`. Used only when DATA_SOURCE=memory. Not production data; never loaded in MySQL mode.",
+ "generatedAt": "2026-11-02",
+ "categories": [
+  "Vegetables",
+  "Fruits",
+  "Grains",
+  "Rice & Pulses",
+  "Dairy",
+  "Meat & Seafood",
+  "Spices",
+  "Oils & Sauces",
+  "Other"
+ ],
+ "ingredients": [
+  {
+   "id": "tomato",
+   "name": "Tomato",
+   "emoji": "🍅",
+   "category": "Vegetables",
+   "defaultUnit": "pcs"
+  },
+  {
+   "id": "onion",
+   "name": "Onion",
+   "emoji": "🧅",
+   "category": "Vegetables",
+   "defaultUnit": "pcs"
+  },
+  {
+   "id": "potato",
+   "name": "Potato",
+   "emoji": "🥔",
+   "category": "Vegetables",
+   "defaultUnit": "pcs",
+   "aliases": [
+    "aloo"
+   ]
+  },
+  {
+   "id": "green-chilli",
+   "name": "Green chilli",
+   "emoji": "🌶️",
+   "category": "Vegetables",
+   "defaultUnit": "pcs",
+   "aliases": [
+    "mirchi",
+    "chili"
+   ]
+  },
+  {
+   "id": "coriander",
+   "name": "Coriander",
+   "emoji": "🌿",
+   "category": "Vegetables",
+   "defaultUnit": "bunch",
+   "aliases": [
+    "cilantro",
+    "dhania"
+   ]
+  },
+  {
+   "id": "garlic",
+   "name": "Garlic",
+   "emoji": "🧄",
+   "category": "Vegetables",
+   "defaultUnit": "pcs"
+  },
+  {
+   "id": "ginger",
+   "name": "Ginger",
+   "emoji": "🫚",
+   "category": "Vegetables",
+   "defaultUnit": "g"
+  },
+  {
+   "id": "carrot",
+   "name": "Carrot",
+   "emoji": "🥕",
+   "category": "Vegetables",
+   "defaultUnit": "pcs"
+  },
+  {
+   "id": "bell-pepper",
+   "name": "Bell pepper",
+   "emoji": "🫑",
+   "category": "Vegetables",
+   "defaultUnit": "pcs",
+   "aliases": [
+    "capsicum"
+   ]
+  },
+  {
+   "id": "mushroom",
+   "name": "Mushroom",
+   "emoji": "🍄",
+   "category": "Vegetables",
+   "defaultUnit": "g"
+  },
+  {
+   "id": "spinach",
+   "name": "Spinach",
+   "emoji": "🥬",
+   "category": "Vegetables",
+   "defaultUnit": "bunch",
+   "aliases": [
+    "palak"
+   ]
+  },
+  {
+   "id": "cucumber",
+   "name": "Cucumber",
+   "emoji": "🥒",
+   "category": "Vegetables",
+   "defaultUnit": "pcs"
+  },
+  {
+   "id": "broccoli",
+   "name": "Broccoli",
+   "emoji": "🥦",
+   "category": "Vegetables",
+   "defaultUnit": "g"
+  },
+  {
+   "id": "corn",
+   "name": "Sweet corn",
+   "emoji": "🌽",
+   "category": "Vegetables",
+   "defaultUnit": "cup"
+  },
+  {
+   "id": "peas",
+   "name": "Green peas",
+   "emoji": "🫛",
+   "category": "Vegetables",
+   "defaultUnit": "cup",
+   "aliases": [
+    "matar"
+   ]
+  },
+  {
+   "id": "spring-onion",
+   "name": "Spring onion",
+   "emoji": "🌱",
+   "category": "Vegetables",
+   "defaultUnit": "bunch",
+   "aliases": [
+    "scallion"
+   ]
+  },
+  {
+   "id": "basil",
+   "name": "Basil",
+   "emoji": "🌿",
+   "category": "Vegetables",
+   "defaultUnit": "bunch"
+  },
+  {
+   "id": "lemon",
+   "name": "Lemon",
+   "emoji": "🍋",
+   "category": "Fruits",
+   "defaultUnit": "pcs",
+   "aliases": [
+    "lime",
+    "nimbu"
+   ]
+  },
+  {
+   "id": "banana",
+   "name": "Banana",
+   "emoji": "🍌",
+   "category": "Fruits",
+   "defaultUnit": "pcs"
+  },
+  {
+   "id": "avocado",
+   "name": "Avocado",
+   "emoji": "🥑",
+   "category": "Fruits",
+   "defaultUnit": "pcs"
+  },
+  {
+   "id": "mango",
+   "name": "Mango",
+   "emoji": "🥭",
+   "category": "Fruits",
+   "defaultUnit": "pcs"
+  },
+  {
+   "id": "apple",
+   "name": "Apple",
+   "emoji": "🍎",
+   "category": "Fruits",
+   "defaultUnit": "pcs"
+  },
+  {
+   "id": "bread",
+   "name": "Bread",
+   "emoji": "🍞",
+   "category": "Grains",
+   "defaultUnit": "pcs"
+  },
+  {
+   "id": "pasta",
+   "name": "Pasta",
+   "emoji": "🍝",
+   "category": "Grains",
+   "defaultUnit": "g"
+  },
+  {
+   "id": "noodles",
+   "name": "Noodles",
+   "emoji": "🍜",
+   "category": "Grains",
+   "defaultUnit": "g"
+  },
+  {
+   "id": "oats",
+   "name": "Oats",
+   "emoji": "🥣",
+   "category": "Grains",
+   "defaultUnit": "cup"
+  },
+  {
+   "id": "flour",
+   "name": "Wheat flour",
+   "emoji": "🌾",
+   "category": "Grains",
+   "defaultUnit": "cup",
+   "aliases": [
+    "atta"
+   ]
+  },
+  {
+   "id": "tortilla",
+   "name": "Tortilla",
+   "emoji": "🫓",
+   "category": "Grains",
+   "defaultUnit": "pcs",
+   "aliases": [
+    "roti",
+    "wrap"
+   ]
+  },
+  {
+   "id": "puffed-rice",
+   "name": "Puffed rice",
+   "emoji": "🍚",
+   "category": "Grains",
+   "defaultUnit": "cup",
+   "aliases": [
+    "murmura",
+    "muri",
+    "kurmura",
+    "mamra",
+    "puffed rice",
+    "murmure"
+   ]
+  },
+  {
+   "id": "sev",
+   "name": "Sev / bhujia",
+   "emoji": "🥨",
+   "category": "Other",
+   "defaultUnit": "tbsp",
+   "aliases": [
+    "bhujia",
+    "namkeen"
+   ]
+  },
+  {
+   "id": "poha",
+   "name": "Poha (flattened rice)",
+   "emoji": "🍚",
+   "category": "Grains",
+   "defaultUnit": "cup"
+  },
+  {
+   "id": "rice",
+   "name": "Rice",
+   "emoji": "🍚",
+   "category": "Rice & Pulses",
+   "defaultUnit": "g"
+  },
+  {
+   "id": "dal",
+   "name": "Toor / moong dal",
+   "emoji": "🫘",
+   "category": "Rice & Pulses",
+   "defaultUnit": "cup",
+   "aliases": [
+    "lentils"
+   ]
+  },
+  {
+   "id": "chickpeas",
+   "name": "Chickpeas",
+   "emoji": "🫘",
+   "category": "Rice & Pulses",
+   "defaultUnit": "cup",
+   "aliases": [
+    "chana"
+   ]
+  },
+  {
+   "id": "rajma",
+   "name": "Kidney beans",
+   "emoji": "🫘",
+   "category": "Rice & Pulses",
+   "defaultUnit": "cup",
+   "aliases": [
+    "rajma"
+   ]
+  },
+  {
+   "id": "egg",
+   "name": "Egg",
+   "emoji": "🥚",
+   "category": "Dairy",
+   "defaultUnit": "pcs",
+   "aliases": [
+    "eggs"
+   ]
+  },
+  {
+   "id": "milk",
+   "name": "Milk",
+   "emoji": "🥛",
+   "category": "Dairy",
+   "defaultUnit": "ml"
+  },
+  {
+   "id": "butter",
+   "name": "Butter",
+   "emoji": "🧈",
+   "category": "Dairy",
+   "defaultUnit": "g"
+  },
+  {
+   "id": "paneer",
+   "name": "Paneer",
+   "emoji": "🧀",
+   "category": "Dairy",
+   "defaultUnit": "g"
+  },
+  {
+   "id": "cheese",
+   "name": "Cheese",
+   "emoji": "🧀",
+   "category": "Dairy",
+   "defaultUnit": "g"
+  },
+  {
+   "id": "curd",
+   "name": "Curd / yogurt",
+   "emoji": "🥛",
+   "category": "Dairy",
+   "defaultUnit": "cup",
+   "aliases": [
+    "dahi",
+    "yoghurt"
+   ]
+  },
+  {
+   "id": "cream",
+   "name": "Fresh cream",
+   "emoji": "🥛",
+   "category": "Dairy",
+   "defaultUnit": "ml"
+  },
+  {
+   "id": "chicken",
+   "name": "Chicken",
+   "emoji": "🍗",
+   "category": "Meat & Seafood",
+   "defaultUnit": "g"
+  },
+  {
+   "id": "fish",
+   "name": "Fish",
+   "emoji": "🐟",
+   "category": "Meat & Seafood",
+   "defaultUnit": "g"
+  },
+  {
+   "id": "prawns",
+   "name": "Prawns",
+   "emoji": "🦐",
+   "category": "Meat & Seafood",
+   "defaultUnit": "g",
+   "aliases": [
+    "shrimp"
+   ]
+  },
+  {
+   "id": "salt",
+   "name": "Salt",
+   "emoji": "🧂",
+   "category": "Spices",
+   "defaultUnit": "tsp",
+   "staple": true
+  },
+  {
+   "id": "turmeric",
+   "name": "Turmeric",
+   "emoji": "🟡",
+   "category": "Spices",
+   "defaultUnit": "tsp",
+   "staple": true,
+   "aliases": [
+    "haldi"
+   ]
+  },
+  {
+   "id": "cumin",
+   "name": "Cumin seeds",
+   "emoji": "🟤",
+   "category": "Spices",
+   "defaultUnit": "tsp",
+   "staple": true,
+   "aliases": [
+    "jeera"
+   ]
+  },
+  {
+   "id": "chilli-powder",
+   "name": "Red chilli powder",
+   "emoji": "🔴",
+   "category": "Spices",
+   "defaultUnit": "tsp",
+   "staple": true
+  },
+  {
+   "id": "garam-masala",
+   "name": "Garam masala",
+   "emoji": "🟠",
+   "category": "Spices",
+   "defaultUnit": "tsp"
+  },
+  {
+   "id": "black-pepper",
+   "name": "Black pepper",
+   "emoji": "⚫",
+   "category": "Spices",
+   "defaultUnit": "tsp",
+   "staple": true
+  },
+  {
+   "id": "mustard-seeds",
+   "name": "Mustard seeds",
+   "emoji": "🟤",
+   "category": "Spices",
+   "defaultUnit": "tsp",
+   "staple": true
+  },
+  {
+   "id": "chilli-flakes",
+   "name": "Chilli flakes",
+   "emoji": "🌶️",
+   "category": "Spices",
+   "defaultUnit": "tsp"
+  },
+  {
+   "id": "oil",
+   "name": "Cooking oil",
+   "emoji": "🫗",
+   "category": "Oils & Sauces",
+   "defaultUnit": "tbsp",
+   "staple": true
+  },
+  {
+   "id": "olive-oil",
+   "name": "Olive oil",
+   "emoji": "🫒",
+   "category": "Oils & Sauces",
+   "defaultUnit": "tbsp"
+  },
+  {
+   "id": "soy-sauce",
+   "name": "Soy sauce",
+   "emoji": "🥢",
+   "category": "Oils & Sauces",
+   "defaultUnit": "tbsp"
+  },
+  {
+   "id": "ghee",
+   "name": "Ghee",
+   "emoji": "🧈",
+   "category": "Oils & Sauces",
+   "defaultUnit": "tbsp"
+  },
+  {
+   "id": "coconut-milk",
+   "name": "Coconut milk",
+   "emoji": "🥥",
+   "category": "Oils & Sauces",
+   "defaultUnit": "ml"
+  },
+  {
+   "id": "salsa",
+   "name": "Tomato salsa",
+   "emoji": "🥫",
+   "category": "Oils & Sauces",
+   "defaultUnit": "cup"
+  },
+  {
+   "id": "sugar",
+   "name": "Sugar",
+   "emoji": "🍬",
+   "category": "Other",
+   "defaultUnit": "tsp",
+   "staple": true
+  },
+  {
+   "id": "water",
+   "name": "Water",
+   "emoji": "💧",
+   "category": "Other",
+   "defaultUnit": "cup",
+   "staple": true
+  },
+  {
+   "id": "peanuts",
+   "name": "Peanuts",
+   "emoji": "🥜",
+   "category": "Other",
+   "defaultUnit": "tbsp"
+  },
+  {
+   "id": "honey",
+   "name": "Honey",
+   "emoji": "🍯",
+   "category": "Other",
+   "defaultUnit": "tbsp"
+  },
+  {
+   "id": "tofu",
+   "name": "Tofu",
+   "emoji": "⬜",
+   "category": "Other",
+   "defaultUnit": "g"
+  }
+ ],
+ "recipes": [
+  {
+   "id": "masala-omelette",
+   "name": "Masala Omelette",
+   "tagline": "Fluffy eggs with onion, tomato and green chilli",
+   "emoji": "🍳",
+   "palette": [
+    "#F2B33D",
+    "#C4561E"
+   ],
+   "cuisine": "Indian",
+   "moods": [
+    "quick",
+    "protein",
+    "comfort"
+   ],
+   "diets": [
+    "vegetarian",
+    "gluten-free",
+    "high-protein",
+    "low-carb"
+   ],
+   "allergens": [
+    "egg"
+   ],
+   "difficulty": "Beginner",
+   "prepMin": 5,
+   "cookMin": 6,
+   "servings": 1,
+   "equipment": [
+    [
+     "gas",
+     "pan"
+    ],
+    [
+     "induction",
+     "pan"
+    ]
+   ],
+   "ingredients": [
+    {
+     "ingredientId": "egg",
+     "quantity": 2,
+     "unit": "pcs"
+    },
+    {
+     "ingredientId": "onion",
+     "quantity": 0.5,
+     "unit": "pcs",
+     "note": "finely chopped"
+    },
+    {
+     "ingredientId": "tomato",
+     "quantity": 0.5,
+     "unit": "pcs",
+     "note": "deseeded, chopped"
+    },
+    {
+     "ingredientId": "green-chilli",
+     "quantity": 1,
+     "unit": "pcs",
+     "note": "minced"
+    },
+    {
+     "ingredientId": "coriander",
+     "quantity": 1,
+     "unit": "tbsp",
+     "note": "chopped",
+     "optional": true
+    },
+    {
+     "ingredientId": "turmeric",
+     "quantity": 0.25,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "salt",
+     "quantity": 0.25,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "oil",
+     "quantity": 1,
+     "unit": "tbsp"
+    }
+   ],
+   "steps": [
+    {
+     "text": "Crack the eggs into a bowl. Add salt and turmeric and whisk until slightly frothy."
+    },
+    {
+     "text": "Stir in the chopped onion, tomato, green chilli and coriander."
+    },
+    {
+     "text": "Heat the oil in a frying pan over medium heat until it shimmers.",
+     "timer": 60
+    },
+    {
+     "text": "Pour in the egg mixture and spread it evenly. Cook without stirring until the edges set.",
+     "timer": 120
+    },
+    {
+     "text": "Flip the omelette carefully and cook the other side for about a minute.",
+     "timer": 60,
+     "tip": "Lower the heat if the bottom browns too fast."
+    },
+    {
+     "text": "Fold, slide onto a plate and serve hot with toast or roti."
+    }
+   ],
+   "substitutions": [
+    {
+     "ingredientId": "green-chilli",
+     "options": [
+      "a pinch of red chilli powder",
+      "black pepper for a milder version"
+     ]
+    },
+    {
+     "ingredientId": "oil",
+     "options": [
+      "butter",
+      "ghee"
+     ]
+    }
+   ],
+   "weather": "any"
+  },
+  {
+   "id": "aloo-jeera",
+   "name": "Jeera Aloo",
+   "tagline": "Cumin-tempered potatoes with a hint of lemon",
+   "emoji": "🥔",
+   "palette": [
+    "#E8B04A",
+    "#7A5A1E"
+   ],
+   "cuisine": "Indian",
+   "moods": [
+    "comfort",
+    "quick"
+   ],
+   "diets": [
+    "vegetarian",
+    "vegan",
+    "gluten-free",
+    "dairy-free"
+   ],
+   "allergens": [],
+   "difficulty": "Beginner",
+   "prepMin": 10,
+   "cookMin": 15,
+   "servings": 2,
+   "equipment": [
+    [
+     "gas",
+     "pan"
+    ],
+    [
+     "induction",
+     "pan"
+    ]
+   ],
+   "ingredients": [
+    {
+     "ingredientId": "potato",
+     "quantity": 3,
+     "unit": "pcs",
+     "note": "boiled and cubed"
+    },
+    {
+     "ingredientId": "cumin",
+     "quantity": 1,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "green-chilli",
+     "quantity": 1,
+     "unit": "pcs",
+     "note": "slit"
+    },
+    {
+     "ingredientId": "turmeric",
+     "quantity": 0.25,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "chilli-powder",
+     "quantity": 0.5,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "coriander",
+     "quantity": 2,
+     "unit": "tbsp",
+     "optional": true
+    },
+    {
+     "ingredientId": "lemon",
+     "quantity": 0.5,
+     "unit": "pcs",
+     "optional": true
+    },
+    {
+     "ingredientId": "oil",
+     "quantity": 2,
+     "unit": "tbsp"
+    },
+    {
+     "ingredientId": "salt",
+     "quantity": 0.75,
+     "unit": "tsp"
+    }
+   ],
+   "steps": [
+    {
+     "text": "Boil the potatoes until just tender, cool slightly, peel and cut into cubes.",
+     "timer": 600
+    },
+    {
+     "text": "Heat oil in a pan and add the cumin seeds. Let them sizzle until fragrant.",
+     "timer": 30
+    },
+    {
+     "text": "Add the green chilli, turmeric and red chilli powder. Stir for a few seconds."
+    },
+    {
+     "text": "Add the potatoes and salt. Toss and cook until the edges turn golden.",
+     "timer": 300
+    },
+    {
+     "text": "Finish with lemon juice and chopped coriander. Serve warm."
+    }
+   ],
+   "substitutions": [
+    {
+     "ingredientId": "lemon",
+     "options": [
+      "a pinch of amchur (dry mango powder)"
+     ]
+    },
+    {
+     "ingredientId": "cumin",
+     "options": [
+      "mustard seeds for a South-Indian style"
+     ]
+    }
+   ],
+   "weather": "any"
+  },
+  {
+   "id": "tomato-egg-fried-rice",
+   "name": "Tomato Egg Fried Rice",
+   "tagline": "Leftover rice turned into a smoky one-pan dinner",
+   "emoji": "🍛",
+   "palette": [
+    "#E5763A",
+    "#8A2B1A"
+   ],
+   "cuisine": "Chinese",
+   "moods": [
+    "quick",
+    "comfort",
+    "protein"
+   ],
+   "diets": [
+    "vegetarian",
+    "dairy-free",
+    "high-protein"
+   ],
+   "allergens": [
+    "egg",
+    "soy",
+    "gluten"
+   ],
+   "difficulty": "Beginner",
+   "prepMin": 10,
+   "cookMin": 12,
+   "servings": 2,
+   "equipment": [
+    [
+     "gas",
+     "pan"
+    ],
+    [
+     "induction",
+     "pan"
+    ]
+   ],
+   "ingredients": [
+    {
+     "ingredientId": "rice",
+     "quantity": 300,
+     "unit": "g",
+     "note": "cooked and cooled"
+    },
+    {
+     "ingredientId": "egg",
+     "quantity": 2,
+     "unit": "pcs"
+    },
+    {
+     "ingredientId": "tomato",
+     "quantity": 2,
+     "unit": "pcs",
+     "note": "chopped"
+    },
+    {
+     "ingredientId": "onion",
+     "quantity": 1,
+     "unit": "pcs",
+     "note": "sliced"
+    },
+    {
+     "ingredientId": "garlic",
+     "quantity": 2,
+     "unit": "pcs",
+     "note": "cloves, minced"
+    },
+    {
+     "ingredientId": "soy-sauce",
+     "quantity": 1,
+     "unit": "tbsp"
+    },
+    {
+     "ingredientId": "spring-onion",
+     "quantity": 2,
+     "unit": "tbsp",
+     "optional": true
+    },
+    {
+     "ingredientId": "oil",
+     "quantity": 2,
+     "unit": "tbsp"
+    },
+    {
+     "ingredientId": "salt",
+     "quantity": 0.5,
+     "unit": "tsp"
+    }
+   ],
+   "steps": [
+    {
+     "text": "Beat the eggs with a pinch of salt. Scramble them in 1 tbsp hot oil until just set, then remove.",
+     "timer": 90
+    },
+    {
+     "text": "Add the remaining oil, then the garlic and onion. Stir-fry on high heat until the onion softens.",
+     "timer": 120
+    },
+    {
+     "text": "Add the tomatoes and cook until they break down and turn jammy.",
+     "timer": 240
+    },
+    {
+     "text": "Add the rice and soy sauce. Toss on high heat so every grain is coated.",
+     "timer": 180
+    },
+    {
+     "text": "Fold the eggs back in, check the salt and finish with spring onion."
+    }
+   ],
+   "substitutions": [
+    {
+     "ingredientId": "soy-sauce",
+     "options": [
+      "a pinch of salt plus a dash of vinegar",
+      "tamari for gluten-free"
+     ]
+    },
+    {
+     "ingredientId": "garlic",
+     "options": [
+      "a pinch of asafoetida",
+      "toasted shallots"
+     ]
+    }
+   ],
+   "weather": "any"
+  },
+  {
+   "id": "dal-tadka",
+   "name": "Dal Tadka",
+   "tagline": "Silky yellow lentils with a garlicky tempering",
+   "emoji": "🥣",
+   "palette": [
+    "#F0C24B",
+    "#A1611A"
+   ],
+   "cuisine": "Indian",
+   "moods": [
+    "comfort",
+    "healthy",
+    "protein"
+   ],
+   "diets": [
+    "vegetarian",
+    "vegan",
+    "gluten-free",
+    "dairy-free",
+    "high-protein"
+   ],
+   "allergens": [],
+   "difficulty": "Beginner",
+   "prepMin": 10,
+   "cookMin": 25,
+   "servings": 3,
+   "equipment": [
+    [
+     "gas",
+     "pressure"
+    ],
+    [
+     "induction",
+     "pressure"
+    ]
+   ],
+   "ingredients": [
+    {
+     "ingredientId": "dal",
+     "quantity": 1,
+     "unit": "cup",
+     "note": "rinsed"
+    },
+    {
+     "ingredientId": "tomato",
+     "quantity": 1,
+     "unit": "pcs",
+     "note": "chopped"
+    },
+    {
+     "ingredientId": "onion",
+     "quantity": 1,
+     "unit": "pcs",
+     "note": "chopped"
+    },
+    {
+     "ingredientId": "garlic",
+     "quantity": 4,
+     "unit": "pcs",
+     "note": "cloves, sliced"
+    },
+    {
+     "ingredientId": "green-chilli",
+     "quantity": 1,
+     "unit": "pcs"
+    },
+    {
+     "ingredientId": "cumin",
+     "quantity": 1,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "turmeric",
+     "quantity": 0.5,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "chilli-powder",
+     "quantity": 0.5,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "oil",
+     "quantity": 2,
+     "unit": "tbsp"
+    },
+    {
+     "ingredientId": "salt",
+     "quantity": 1,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "water",
+     "quantity": 3,
+     "unit": "cup"
+    }
+   ],
+   "steps": [
+    {
+     "text": "Pressure-cook the dal with water, turmeric and salt for 3–4 whistles until completely soft.",
+     "timer": 720
+    },
+    {
+     "text": "Whisk the cooked dal until smooth. Keep it warm on low heat."
+    },
+    {
+     "text": "Heat oil in a small pan. Add cumin and let it crackle, then add garlic until golden.",
+     "timer": 60
+    },
+    {
+     "text": "Add onion and green chilli and sauté until soft, then add tomato and chilli powder and cook until mushy.",
+     "timer": 300
+    },
+    {
+     "text": "Pour the tempering over the dal, simmer two minutes and serve with rice.",
+     "timer": 120
+    }
+   ],
+   "substitutions": [
+    {
+     "ingredientId": "garlic",
+     "options": [
+      "a pinch of asafoetida (hing)"
+     ]
+    },
+    {
+     "ingredientId": "oil",
+     "options": [
+      "ghee for a richer tadka"
+     ]
+    }
+   ],
+   "weather": "warm"
+  },
+  {
+   "id": "poha",
+   "name": "Kanda Poha",
+   "tagline": "Light, lemony flattened rice — the classic breakfast",
+   "emoji": "🍚",
+   "palette": [
+    "#F4D35E",
+    "#5C8D3A"
+   ],
+   "cuisine": "Indian",
+   "moods": [
+    "light",
+    "quick",
+    "healthy"
+   ],
+   "diets": [
+    "vegetarian",
+    "vegan",
+    "gluten-free",
+    "dairy-free"
+   ],
+   "allergens": [
+    "nuts"
+   ],
+   "difficulty": "Beginner",
+   "prepMin": 10,
+   "cookMin": 10,
+   "servings": 2,
+   "equipment": [
+    [
+     "gas",
+     "pan"
+    ],
+    [
+     "induction",
+     "pan"
+    ]
+   ],
+   "ingredients": [
+    {
+     "ingredientId": "poha",
+     "quantity": 2,
+     "unit": "cup"
+    },
+    {
+     "ingredientId": "onion",
+     "quantity": 1,
+     "unit": "pcs",
+     "note": "chopped"
+    },
+    {
+     "ingredientId": "green-chilli",
+     "quantity": 2,
+     "unit": "pcs"
+    },
+    {
+     "ingredientId": "peanuts",
+     "quantity": 2,
+     "unit": "tbsp",
+     "optional": true
+    },
+    {
+     "ingredientId": "mustard-seeds",
+     "quantity": 1,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "turmeric",
+     "quantity": 0.5,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "lemon",
+     "quantity": 1,
+     "unit": "pcs"
+    },
+    {
+     "ingredientId": "coriander",
+     "quantity": 2,
+     "unit": "tbsp",
+     "optional": true
+    },
+    {
+     "ingredientId": "oil",
+     "quantity": 2,
+     "unit": "tbsp"
+    },
+    {
+     "ingredientId": "sugar",
+     "quantity": 1,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "salt",
+     "quantity": 0.75,
+     "unit": "tsp"
+    }
+   ],
+   "steps": [
+    {
+     "text": "Rinse the poha in a sieve until soft but not mushy. Let it drain."
+    },
+    {
+     "text": "Heat oil, fry the peanuts until crunchy and set them aside.",
+     "timer": 90
+    },
+    {
+     "text": "Add mustard seeds; once they pop, add onion and green chilli and cook until translucent.",
+     "timer": 180
+    },
+    {
+     "text": "Add turmeric, salt and sugar, then fold in the poha gently. Cover and steam on low.",
+     "timer": 120
+    },
+    {
+     "text": "Finish with lemon juice, peanuts and coriander."
+    }
+   ],
+   "substitutions": [
+    {
+     "ingredientId": "peanuts",
+     "options": [
+      "roasted cashews",
+      "skip for a nut-free version"
+     ]
+    }
+   ],
+   "weather": "any"
+  },
+  {
+   "id": "pasta-pomodoro",
+   "name": "Pasta al Pomodoro",
+   "tagline": "Bright tomato, garlic and basil — Italian simplicity",
+   "emoji": "🍝",
+   "palette": [
+    "#E2442F",
+    "#7E1A16"
+   ],
+   "cuisine": "Italian",
+   "moods": [
+    "comfort",
+    "special"
+   ],
+   "diets": [
+    "vegetarian",
+    "dairy-free"
+   ],
+   "allergens": [
+    "gluten"
+   ],
+   "difficulty": "Beginner",
+   "prepMin": 10,
+   "cookMin": 20,
+   "servings": 2,
+   "equipment": [
+    [
+     "gas",
+     "pan"
+    ],
+    [
+     "induction",
+     "pan"
+    ]
+   ],
+   "ingredients": [
+    {
+     "ingredientId": "pasta",
+     "quantity": 200,
+     "unit": "g"
+    },
+    {
+     "ingredientId": "tomato",
+     "quantity": 4,
+     "unit": "pcs",
+     "note": "grated or chopped"
+    },
+    {
+     "ingredientId": "garlic",
+     "quantity": 3,
+     "unit": "pcs",
+     "note": "cloves, sliced"
+    },
+    {
+     "ingredientId": "olive-oil",
+     "quantity": 3,
+     "unit": "tbsp"
+    },
+    {
+     "ingredientId": "basil",
+     "quantity": 1,
+     "unit": "bunch",
+     "optional": true
+    },
+    {
+     "ingredientId": "chilli-flakes",
+     "quantity": 0.5,
+     "unit": "tsp",
+     "optional": true
+    },
+    {
+     "ingredientId": "cheese",
+     "quantity": 30,
+     "unit": "g",
+     "optional": true,
+     "note": "grated, to serve"
+    },
+    {
+     "ingredientId": "salt",
+     "quantity": 1,
+     "unit": "tsp"
+    }
+   ],
+   "steps": [
+    {
+     "text": "Bring a large pot of well-salted water to a boil and cook the pasta until al dente.",
+     "timer": 600
+    },
+    {
+     "text": "Meanwhile, warm the olive oil and gently cook the garlic until pale gold.",
+     "timer": 90
+    },
+    {
+     "text": "Add the tomatoes and chilli flakes and simmer until thick and glossy.",
+     "timer": 600
+    },
+    {
+     "text": "Toss the drained pasta into the sauce with a splash of pasta water."
+    },
+    {
+     "text": "Tear in the basil, finish with cheese if you like, and serve immediately."
+    }
+   ],
+   "substitutions": [
+    {
+     "ingredientId": "olive-oil",
+     "options": [
+      "any neutral oil plus a knob of butter"
+     ]
+    },
+    {
+     "ingredientId": "basil",
+     "options": [
+      "coriander for an Indo-Italian twist",
+      "dried oregano"
+     ]
+    }
+   ],
+   "weather": "any"
+  },
+  {
+   "id": "paneer-bhurji",
+   "name": "Paneer Bhurji",
+   "tagline": "Scrambled paneer with onions, tomato and spice",
+   "emoji": "🧀",
+   "palette": [
+    "#F5C45E",
+    "#B04A20"
+   ],
+   "cuisine": "Indian",
+   "moods": [
+    "protein",
+    "spicy",
+    "quick"
+   ],
+   "diets": [
+    "vegetarian",
+    "gluten-free",
+    "high-protein",
+    "low-carb"
+   ],
+   "allergens": [
+    "dairy"
+   ],
+   "difficulty": "Beginner",
+   "prepMin": 10,
+   "cookMin": 10,
+   "servings": 2,
+   "equipment": [
+    [
+     "gas",
+     "pan"
+    ],
+    [
+     "induction",
+     "pan"
+    ]
+   ],
+   "ingredients": [
+    {
+     "ingredientId": "paneer",
+     "quantity": 200,
+     "unit": "g",
+     "note": "crumbled"
+    },
+    {
+     "ingredientId": "onion",
+     "quantity": 1,
+     "unit": "pcs",
+     "note": "chopped"
+    },
+    {
+     "ingredientId": "tomato",
+     "quantity": 1,
+     "unit": "pcs",
+     "note": "chopped"
+    },
+    {
+     "ingredientId": "green-chilli",
+     "quantity": 2,
+     "unit": "pcs"
+    },
+    {
+     "ingredientId": "bell-pepper",
+     "quantity": 0.5,
+     "unit": "pcs",
+     "optional": true
+    },
+    {
+     "ingredientId": "garam-masala",
+     "quantity": 0.5,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "turmeric",
+     "quantity": 0.25,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "coriander",
+     "quantity": 2,
+     "unit": "tbsp",
+     "optional": true
+    },
+    {
+     "ingredientId": "oil",
+     "quantity": 1,
+     "unit": "tbsp"
+    },
+    {
+     "ingredientId": "salt",
+     "quantity": 0.5,
+     "unit": "tsp"
+    }
+   ],
+   "steps": [
+    {
+     "text": "Heat oil and sauté the onion and green chilli until soft.",
+     "timer": 180
+    },
+    {
+     "text": "Add tomato, bell pepper, turmeric and salt. Cook until the tomato softens.",
+     "timer": 180
+    },
+    {
+     "text": "Add the crumbled paneer and garam masala. Mix well and cook for two minutes.",
+     "timer": 120
+    },
+    {
+     "text": "Garnish with coriander and serve with toast or roti."
+    }
+   ],
+   "substitutions": [
+    {
+     "ingredientId": "paneer",
+     "options": [
+      "firm tofu (vegan)",
+      "scrambled eggs"
+     ]
+    }
+   ],
+   "weather": "any"
+  },
+  {
+   "id": "veg-hakka-noodles",
+   "name": "Veg Hakka Noodles",
+   "tagline": "Wok-tossed noodles with crunchy vegetables",
+   "emoji": "🍜",
+   "palette": [
+    "#D99A3C",
+    "#3E6B2A"
+   ],
+   "cuisine": "Chinese",
+   "moods": [
+    "spicy",
+    "quick",
+    "comfort"
+   ],
+   "diets": [
+    "vegetarian",
+    "vegan",
+    "dairy-free"
+   ],
+   "allergens": [
+    "gluten",
+    "soy"
+   ],
+   "difficulty": "Intermediate",
+   "prepMin": 15,
+   "cookMin": 10,
+   "servings": 2,
+   "equipment": [
+    [
+     "gas",
+     "pan"
+    ],
+    [
+     "induction",
+     "pan"
+    ]
+   ],
+   "ingredients": [
+    {
+     "ingredientId": "noodles",
+     "quantity": 200,
+     "unit": "g"
+    },
+    {
+     "ingredientId": "carrot",
+     "quantity": 1,
+     "unit": "pcs",
+     "note": "julienned"
+    },
+    {
+     "ingredientId": "bell-pepper",
+     "quantity": 1,
+     "unit": "pcs",
+     "note": "sliced"
+    },
+    {
+     "ingredientId": "onion",
+     "quantity": 1,
+     "unit": "pcs",
+     "note": "sliced"
+    },
+    {
+     "ingredientId": "garlic",
+     "quantity": 3,
+     "unit": "pcs",
+     "note": "cloves, minced"
+    },
+    {
+     "ingredientId": "soy-sauce",
+     "quantity": 2,
+     "unit": "tbsp"
+    },
+    {
+     "ingredientId": "spring-onion",
+     "quantity": 2,
+     "unit": "tbsp",
+     "optional": true
+    },
+    {
+     "ingredientId": "chilli-flakes",
+     "quantity": 0.5,
+     "unit": "tsp",
+     "optional": true
+    },
+    {
+     "ingredientId": "oil",
+     "quantity": 2,
+     "unit": "tbsp"
+    }
+   ],
+   "steps": [
+    {
+     "text": "Boil the noodles until just cooked, drain, rinse in cold water and toss with a little oil.",
+     "timer": 240
+    },
+    {
+     "text": "Heat oil on the highest flame. Add garlic and stir for 20 seconds.",
+     "timer": 20
+    },
+    {
+     "text": "Add onion, carrot and bell pepper. Stir-fry for two minutes so they stay crunchy.",
+     "timer": 120
+    },
+    {
+     "text": "Add the noodles, soy sauce and chilli flakes. Toss vigorously for a minute.",
+     "timer": 60
+    },
+    {
+     "text": "Finish with spring onion and serve hot."
+    }
+   ],
+   "substitutions": [
+    {
+     "ingredientId": "noodles",
+     "options": [
+      "spaghetti",
+      "rice noodles (gluten-free)"
+     ]
+    }
+   ],
+   "weather": "any"
+  },
+  {
+   "id": "chana-salad",
+   "name": "Lemon Chickpea Salad",
+   "tagline": "Crunchy, protein-packed and ready in minutes",
+   "emoji": "🥗",
+   "palette": [
+    "#9CC56A",
+    "#2E6B4A"
+   ],
+   "cuisine": "Mediterranean",
+   "moods": [
+    "healthy",
+    "light",
+    "protein",
+    "quick"
+   ],
+   "diets": [
+    "vegetarian",
+    "vegan",
+    "gluten-free",
+    "dairy-free",
+    "high-protein"
+   ],
+   "allergens": [],
+   "difficulty": "Beginner",
+   "prepMin": 10,
+   "cookMin": 0,
+   "servings": 2,
+   "equipment": [
+    []
+   ],
+   "ingredients": [
+    {
+     "ingredientId": "chickpeas",
+     "quantity": 1.5,
+     "unit": "cup",
+     "note": "boiled"
+    },
+    {
+     "ingredientId": "cucumber",
+     "quantity": 1,
+     "unit": "pcs",
+     "note": "diced"
+    },
+    {
+     "ingredientId": "tomato",
+     "quantity": 1,
+     "unit": "pcs",
+     "note": "diced"
+    },
+    {
+     "ingredientId": "onion",
+     "quantity": 0.5,
+     "unit": "pcs",
+     "note": "finely chopped"
+    },
+    {
+     "ingredientId": "lemon",
+     "quantity": 1,
+     "unit": "pcs"
+    },
+    {
+     "ingredientId": "olive-oil",
+     "quantity": 1,
+     "unit": "tbsp",
+     "optional": true
+    },
+    {
+     "ingredientId": "coriander",
+     "quantity": 2,
+     "unit": "tbsp",
+     "optional": true
+    },
+    {
+     "ingredientId": "black-pepper",
+     "quantity": 0.5,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "salt",
+     "quantity": 0.5,
+     "unit": "tsp"
+    }
+   ],
+   "steps": [
+    {
+     "text": "Drain the chickpeas well and add them to a large bowl."
+    },
+    {
+     "text": "Add the cucumber, tomato and onion."
+    },
+    {
+     "text": "Squeeze in the lemon, drizzle olive oil, and season with salt and pepper."
+    },
+    {
+     "text": "Toss, top with coriander and rest for five minutes so the flavours mingle.",
+     "timer": 300
+    }
+   ],
+   "substitutions": [
+    {
+     "ingredientId": "chickpeas",
+     "options": [
+      "boiled rajma",
+      "sprouted moong"
+     ]
+    }
+   ],
+   "weather": "cool"
+  },
+  {
+   "id": "egg-curry",
+   "name": "Home-style Egg Curry",
+   "tagline": "Boiled eggs in a rich onion-tomato gravy",
+   "emoji": "🍲",
+   "palette": [
+    "#C8461F",
+    "#5A1410"
+   ],
+   "cuisine": "Indian",
+   "moods": [
+    "spicy",
+    "comfort",
+    "protein"
+   ],
+   "diets": [
+    "vegetarian",
+    "gluten-free",
+    "dairy-free",
+    "high-protein"
+   ],
+   "allergens": [
+    "egg"
+   ],
+   "difficulty": "Intermediate",
+   "prepMin": 15,
+   "cookMin": 25,
+   "servings": 3,
+   "equipment": [
+    [
+     "gas",
+     "pan"
+    ],
+    [
+     "induction",
+     "pan"
+    ]
+   ],
+   "ingredients": [
+    {
+     "ingredientId": "egg",
+     "quantity": 4,
+     "unit": "pcs"
+    },
+    {
+     "ingredientId": "onion",
+     "quantity": 2,
+     "unit": "pcs",
+     "note": "finely chopped"
+    },
+    {
+     "ingredientId": "tomato",
+     "quantity": 2,
+     "unit": "pcs",
+     "note": "pureed"
+    },
+    {
+     "ingredientId": "ginger",
+     "quantity": 10,
+     "unit": "g",
+     "note": "grated"
+    },
+    {
+     "ingredientId": "garlic",
+     "quantity": 4,
+     "unit": "pcs",
+     "note": "cloves, crushed"
+    },
+    {
+     "ingredientId": "green-chilli",
+     "quantity": 1,
+     "unit": "pcs"
+    },
+    {
+     "ingredientId": "turmeric",
+     "quantity": 0.5,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "chilli-powder",
+     "quantity": 1,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "garam-masala",
+     "quantity": 0.5,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "coriander",
+     "quantity": 2,
+     "unit": "tbsp",
+     "optional": true
+    },
+    {
+     "ingredientId": "oil",
+     "quantity": 3,
+     "unit": "tbsp"
+    },
+    {
+     "ingredientId": "salt",
+     "quantity": 1,
+     "unit": "tsp"
+    }
+   ],
+   "steps": [
+    {
+     "text": "Hard-boil the eggs, cool them in water, peel and make shallow slits.",
+     "timer": 600
+    },
+    {
+     "text": "Fry the eggs in a little oil with turmeric until lightly golden, then set aside.",
+     "timer": 120
+    },
+    {
+     "text": "In the same pan cook the onions until deep golden brown.",
+     "timer": 480
+    },
+    {
+     "text": "Add ginger, garlic and green chilli; sauté until the raw smell goes.",
+     "timer": 60
+    },
+    {
+     "text": "Add tomato purée, chilli powder and salt. Cook until oil separates.",
+     "timer": 360
+    },
+    {
+     "text": "Add a cup of water, the eggs and garam masala. Simmer, then finish with coriander.",
+     "timer": 300
+    }
+   ],
+   "substitutions": [
+    {
+     "ingredientId": "ginger",
+     "options": [
+      "skip it, or add a pinch of dry ginger powder"
+     ]
+    },
+    {
+     "ingredientId": "garlic",
+     "options": [
+      "asafoetida",
+      "toasted shallots"
+     ]
+    }
+   ],
+   "weather": "warm"
+  },
+  {
+   "id": "mushroom-stir-fry",
+   "name": "Garlic Mushroom Stir-fry",
+   "tagline": "Buttery mushrooms with pepper and herbs",
+   "emoji": "🍄",
+   "palette": [
+    "#B88A5E",
+    "#3F2A1A"
+   ],
+   "cuisine": "Continental",
+   "moods": [
+    "quick",
+    "special",
+    "healthy"
+   ],
+   "diets": [
+    "vegetarian",
+    "gluten-free",
+    "low-carb"
+   ],
+   "allergens": [
+    "dairy"
+   ],
+   "difficulty": "Beginner",
+   "prepMin": 5,
+   "cookMin": 10,
+   "servings": 2,
+   "equipment": [
+    [
+     "gas",
+     "pan"
+    ],
+    [
+     "induction",
+     "pan"
+    ]
+   ],
+   "ingredients": [
+    {
+     "ingredientId": "mushroom",
+     "quantity": 250,
+     "unit": "g",
+     "note": "sliced"
+    },
+    {
+     "ingredientId": "garlic",
+     "quantity": 4,
+     "unit": "pcs",
+     "note": "cloves, minced"
+    },
+    {
+     "ingredientId": "butter",
+     "quantity": 20,
+     "unit": "g"
+    },
+    {
+     "ingredientId": "bell-pepper",
+     "quantity": 1,
+     "unit": "pcs",
+     "optional": true
+    },
+    {
+     "ingredientId": "black-pepper",
+     "quantity": 0.5,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "spring-onion",
+     "quantity": 2,
+     "unit": "tbsp",
+     "optional": true
+    },
+    {
+     "ingredientId": "salt",
+     "quantity": 0.5,
+     "unit": "tsp"
+    }
+   ],
+   "steps": [
+    {
+     "text": "Melt the butter in a wide pan over medium-high heat."
+    },
+    {
+     "text": "Add the mushrooms in one layer and leave them undisturbed until golden.",
+     "timer": 180,
+     "tip": "Don't salt yet — salt draws out water and stops browning."
+    },
+    {
+     "text": "Add the garlic and bell pepper and toss for a minute.",
+     "timer": 60
+    },
+    {
+     "text": "Season with salt and pepper, top with spring onion and serve."
+    }
+   ],
+   "substitutions": [
+    {
+     "ingredientId": "butter",
+     "options": [
+      "olive oil (dairy-free)"
+     ]
+    }
+   ],
+   "weather": "any"
+  },
+  {
+   "id": "veg-quesadilla",
+   "name": "Veggie Quesadilla",
+   "tagline": "Crisp tortilla, melty cheese, peppers and corn",
+   "emoji": "🌮",
+   "palette": [
+    "#F0A93A",
+    "#6A8A2A"
+   ],
+   "cuisine": "Mexican",
+   "moods": [
+    "comfort",
+    "quick",
+    "special"
+   ],
+   "diets": [
+    "vegetarian"
+   ],
+   "allergens": [
+    "gluten",
+    "dairy"
+   ],
+   "difficulty": "Beginner",
+   "prepMin": 10,
+   "cookMin": 8,
+   "servings": 2,
+   "equipment": [
+    [
+     "gas",
+     "pan"
+    ],
+    [
+     "induction",
+     "pan"
+    ]
+   ],
+   "ingredients": [
+    {
+     "ingredientId": "tortilla",
+     "quantity": 2,
+     "unit": "pcs"
+    },
+    {
+     "ingredientId": "cheese",
+     "quantity": 80,
+     "unit": "g",
+     "note": "grated"
+    },
+    {
+     "ingredientId": "bell-pepper",
+     "quantity": 1,
+     "unit": "pcs",
+     "note": "sliced"
+    },
+    {
+     "ingredientId": "corn",
+     "quantity": 0.5,
+     "unit": "cup"
+    },
+    {
+     "ingredientId": "onion",
+     "quantity": 0.5,
+     "unit": "pcs",
+     "note": "sliced"
+    },
+    {
+     "ingredientId": "chilli-flakes",
+     "quantity": 0.5,
+     "unit": "tsp",
+     "optional": true
+    },
+    {
+     "ingredientId": "oil",
+     "quantity": 1,
+     "unit": "tbsp"
+    }
+   ],
+   "steps": [
+    {
+     "text": "Sauté onion, pepper and corn in a little oil until just soft.",
+     "timer": 180
+    },
+    {
+     "text": "Lay a tortilla in a dry pan, sprinkle cheese on one half and add the vegetables."
+    },
+    {
+     "text": "Fold and cook on medium heat until the base is crisp, then flip.",
+     "timer": 180
+    },
+    {
+     "text": "Cut into wedges and serve with salsa or curd."
+    }
+   ],
+   "substitutions": [
+    {
+     "ingredientId": "tortilla",
+     "options": [
+      "roti",
+      "paratha"
+     ]
+    }
+   ],
+   "weather": "any"
+  },
+  {
+   "id": "thai-green-veg-curry",
+   "name": "Coconut Vegetable Curry",
+   "tagline": "Thai-style coconut broth with crisp vegetables",
+   "emoji": "🥥",
+   "palette": [
+    "#A9C46C",
+    "#1F4D3A"
+   ],
+   "cuisine": "Thai",
+   "moods": [
+    "special",
+    "comfort",
+    "spicy"
+   ],
+   "diets": [
+    "vegetarian",
+    "vegan",
+    "gluten-free",
+    "dairy-free"
+   ],
+   "allergens": [],
+   "difficulty": "Intermediate",
+   "prepMin": 15,
+   "cookMin": 20,
+   "servings": 3,
+   "equipment": [
+    [
+     "gas",
+     "pan"
+    ],
+    [
+     "induction",
+     "pan"
+    ]
+   ],
+   "ingredients": [
+    {
+     "ingredientId": "coconut-milk",
+     "quantity": 400,
+     "unit": "ml"
+    },
+    {
+     "ingredientId": "bell-pepper",
+     "quantity": 1,
+     "unit": "pcs"
+    },
+    {
+     "ingredientId": "carrot",
+     "quantity": 1,
+     "unit": "pcs"
+    },
+    {
+     "ingredientId": "broccoli",
+     "quantity": 150,
+     "unit": "g",
+     "optional": true
+    },
+    {
+     "ingredientId": "garlic",
+     "quantity": 3,
+     "unit": "pcs"
+    },
+    {
+     "ingredientId": "ginger",
+     "quantity": 15,
+     "unit": "g"
+    },
+    {
+     "ingredientId": "green-chilli",
+     "quantity": 3,
+     "unit": "pcs"
+    },
+    {
+     "ingredientId": "basil",
+     "quantity": 1,
+     "unit": "bunch",
+     "optional": true
+    },
+    {
+     "ingredientId": "lemon",
+     "quantity": 1,
+     "unit": "pcs"
+    },
+    {
+     "ingredientId": "oil",
+     "quantity": 1,
+     "unit": "tbsp"
+    },
+    {
+     "ingredientId": "salt",
+     "quantity": 1,
+     "unit": "tsp"
+    }
+   ],
+   "steps": [
+    {
+     "text": "Pound or blend garlic, ginger and green chillies into a coarse paste."
+    },
+    {
+     "text": "Fry the paste in oil until fragrant.",
+     "timer": 90
+    },
+    {
+     "text": "Pour in the coconut milk and bring to a gentle simmer.",
+     "timer": 180
+    },
+    {
+     "text": "Add the vegetables and simmer until tender-crisp.",
+     "timer": 420
+    },
+    {
+     "text": "Season with salt and lemon juice, tear in the basil and serve with rice."
+    }
+   ],
+   "substitutions": [
+    {
+     "ingredientId": "coconut-milk",
+     "options": [
+      "cashew paste blended with water",
+      "thinned curd (not vegan)"
+     ]
+    }
+   ],
+   "weather": "warm"
+  },
+  {
+   "id": "banana-oat-smoothie",
+   "name": "Banana Oat Smoothie",
+   "tagline": "A cool, creamy breakfast in a glass",
+   "emoji": "🥤",
+   "palette": [
+    "#F3DE8A",
+    "#B88A44"
+   ],
+   "cuisine": "Continental",
+   "moods": [
+    "light",
+    "healthy",
+    "quick"
+   ],
+   "diets": [
+    "vegetarian",
+    "high-protein"
+   ],
+   "allergens": [
+    "dairy"
+   ],
+   "difficulty": "Beginner",
+   "prepMin": 5,
+   "cookMin": 0,
+   "servings": 1,
+   "equipment": [
+    []
+   ],
+   "ingredients": [
+    {
+     "ingredientId": "banana",
+     "quantity": 1,
+     "unit": "pcs"
+    },
+    {
+     "ingredientId": "oats",
+     "quantity": 0.25,
+     "unit": "cup"
+    },
+    {
+     "ingredientId": "milk",
+     "quantity": 250,
+     "unit": "ml"
+    },
+    {
+     "ingredientId": "honey",
+     "quantity": 1,
+     "unit": "tbsp",
+     "optional": true
+    },
+    {
+     "ingredientId": "peanuts",
+     "quantity": 1,
+     "unit": "tbsp",
+     "optional": true
+    }
+   ],
+   "steps": [
+    {
+     "text": "Add banana, oats, milk and honey to a blender."
+    },
+    {
+     "text": "Blend until completely smooth.",
+     "timer": 45
+    },
+    {
+     "text": "Pour into a chilled glass and serve right away."
+    }
+   ],
+   "substitutions": [
+    {
+     "ingredientId": "milk",
+     "options": [
+      "oat or almond milk (dairy-free)",
+      "curd thinned with water"
+     ]
+    }
+   ],
+   "weather": "cool"
+  },
+  {
+   "id": "garlic-butter-prawns",
+   "name": "Garlic Butter Prawns",
+   "tagline": "Sizzling prawns, lemon and chilli",
+   "emoji": "🦐",
+   "palette": [
+    "#F28A5B",
+    "#8E2A1E"
+   ],
+   "cuisine": "Mediterranean",
+   "moods": [
+    "special",
+    "protein",
+    "quick"
+   ],
+   "diets": [
+    "gluten-free",
+    "high-protein",
+    "low-carb"
+   ],
+   "allergens": [
+    "shellfish",
+    "dairy"
+   ],
+   "difficulty": "Intermediate",
+   "prepMin": 10,
+   "cookMin": 8,
+   "servings": 2,
+   "equipment": [
+    [
+     "gas",
+     "pan"
+    ],
+    [
+     "induction",
+     "pan"
+    ]
+   ],
+   "ingredients": [
+    {
+     "ingredientId": "prawns",
+     "quantity": 300,
+     "unit": "g",
+     "note": "cleaned"
+    },
+    {
+     "ingredientId": "garlic",
+     "quantity": 5,
+     "unit": "pcs",
+     "note": "cloves, minced"
+    },
+    {
+     "ingredientId": "butter",
+     "quantity": 30,
+     "unit": "g"
+    },
+    {
+     "ingredientId": "lemon",
+     "quantity": 1,
+     "unit": "pcs"
+    },
+    {
+     "ingredientId": "chilli-flakes",
+     "quantity": 0.5,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "coriander",
+     "quantity": 2,
+     "unit": "tbsp",
+     "optional": true
+    },
+    {
+     "ingredientId": "salt",
+     "quantity": 0.5,
+     "unit": "tsp"
+    }
+   ],
+   "steps": [
+    {
+     "text": "Pat the prawns dry and season with salt and chilli flakes."
+    },
+    {
+     "text": "Melt butter in a hot pan, add garlic and cook for 30 seconds.",
+     "timer": 30
+    },
+    {
+     "text": "Add prawns in a single layer; cook until pink on one side, then flip.",
+     "timer": 120
+    },
+    {
+     "text": "Squeeze in lemon, toss with herbs and serve immediately."
+    }
+   ],
+   "substitutions": [
+    {
+     "ingredientId": "prawns",
+     "options": [
+      "paneer cubes",
+      "mushrooms"
+     ]
+    }
+   ],
+   "weather": "any"
+  },
+  {
+   "id": "chicken-teriyaki-bowl",
+   "name": "Chicken Teriyaki Bowl",
+   "tagline": "Glossy soy-honey chicken over steamed rice",
+   "emoji": "🍱",
+   "palette": [
+    "#C77A3A",
+    "#3D1E12"
+   ],
+   "cuisine": "Japanese",
+   "moods": [
+    "protein",
+    "special",
+    "comfort"
+   ],
+   "diets": [
+    "dairy-free",
+    "high-protein"
+   ],
+   "allergens": [
+    "soy",
+    "gluten"
+   ],
+   "difficulty": "Intermediate",
+   "prepMin": 10,
+   "cookMin": 20,
+   "servings": 2,
+   "equipment": [
+    [
+     "gas",
+     "pan"
+    ],
+    [
+     "induction",
+     "pan"
+    ]
+   ],
+   "ingredients": [
+    {
+     "ingredientId": "chicken",
+     "quantity": 300,
+     "unit": "g",
+     "note": "thigh, bite-size"
+    },
+    {
+     "ingredientId": "rice",
+     "quantity": 200,
+     "unit": "g"
+    },
+    {
+     "ingredientId": "soy-sauce",
+     "quantity": 3,
+     "unit": "tbsp"
+    },
+    {
+     "ingredientId": "honey",
+     "quantity": 2,
+     "unit": "tbsp"
+    },
+    {
+     "ingredientId": "garlic",
+     "quantity": 2,
+     "unit": "pcs"
+    },
+    {
+     "ingredientId": "ginger",
+     "quantity": 10,
+     "unit": "g"
+    },
+    {
+     "ingredientId": "spring-onion",
+     "quantity": 2,
+     "unit": "tbsp",
+     "optional": true
+    },
+    {
+     "ingredientId": "oil",
+     "quantity": 1,
+     "unit": "tbsp"
+    }
+   ],
+   "steps": [
+    {
+     "text": "Rinse and cook the rice.",
+     "timer": 900
+    },
+    {
+     "text": "Mix soy sauce, honey, grated garlic and ginger into a glaze."
+    },
+    {
+     "text": "Sear the chicken in hot oil until golden and cooked through.",
+     "timer": 420
+    },
+    {
+     "text": "Pour in the glaze and reduce until it coats the chicken.",
+     "timer": 120
+    },
+    {
+     "text": "Serve over rice, topped with spring onion."
+    }
+   ],
+   "substitutions": [
+    {
+     "ingredientId": "honey",
+     "options": [
+      "sugar or jaggery"
+     ]
+    },
+    {
+     "ingredientId": "chicken",
+     "options": [
+      "tofu",
+      "paneer"
+     ]
+    }
+   ],
+   "weather": "any"
+  },
+  {
+   "id": "jhal-muri",
+   "name": "Jhal Muri",
+   "tagline": "Kolkata's tangy, crunchy puffed-rice street snack",
+   "emoji": "🥗",
+   "palette": [
+    "#F4C95D",
+    "#B5651D"
+   ],
+   "cuisine": "Indian",
+   "moods": [
+    "quick",
+    "light",
+    "spicy"
+   ],
+   "diets": [
+    "vegetarian",
+    "vegan",
+    "gluten-free",
+    "dairy-free"
+   ],
+   "allergens": [
+    "nuts"
+   ],
+   "difficulty": "Beginner",
+   "prepMin": 10,
+   "cookMin": 0,
+   "servings": 2,
+   "equipment": [
+    []
+   ],
+   "ingredients": [
+    {
+     "ingredientId": "puffed-rice",
+     "quantity": 3,
+     "unit": "cup"
+    },
+    {
+     "ingredientId": "onion",
+     "quantity": 1,
+     "unit": "pcs",
+     "note": "finely chopped"
+    },
+    {
+     "ingredientId": "cucumber",
+     "quantity": 0.5,
+     "unit": "pcs",
+     "note": "finely diced"
+    },
+    {
+     "ingredientId": "green-chilli",
+     "quantity": 1,
+     "unit": "pcs",
+     "note": "minced",
+     "optional": true
+    },
+    {
+     "ingredientId": "tomato",
+     "quantity": 0.5,
+     "unit": "pcs",
+     "note": "deseeded, diced",
+     "optional": true
+    },
+    {
+     "ingredientId": "coriander",
+     "quantity": 2,
+     "unit": "tbsp",
+     "optional": true
+    },
+    {
+     "ingredientId": "peanuts",
+     "quantity": 2,
+     "unit": "tbsp",
+     "note": "roasted",
+     "optional": true
+    },
+    {
+     "ingredientId": "sev",
+     "quantity": 2,
+     "unit": "tbsp",
+     "optional": true
+    },
+    {
+     "ingredientId": "lemon",
+     "quantity": 0.5,
+     "unit": "pcs",
+     "optional": true
+    },
+    {
+     "ingredientId": "oil",
+     "quantity": 1,
+     "unit": "tsp",
+     "note": "mustard oil is traditional"
+    },
+    {
+     "ingredientId": "chilli-powder",
+     "quantity": 0.25,
+     "unit": "tsp"
+    },
+    {
+     "ingredientId": "salt",
+     "quantity": 0.5,
+     "unit": "tsp"
+    }
+   ],
+   "steps": [
+    {
+     "text": "Chop the onion, cucumber, green chilli and tomato very finely so every bite gets a bit of everything."
+    },
+    {
+     "text": "If the puffed rice isn't crisp, dry-roast it in a pan for 2 minutes and let it cool.",
+     "timer": 120
+    },
+    {
+     "text": "In a big bowl, toss the onion, cucumber, chilli, tomato and coriander with salt, chilli powder and the oil."
+    },
+    {
+     "text": "Add the puffed rice and peanuts and toss quickly with your hands or two spoons."
+    },
+    {
+     "text": "Squeeze over lemon, top with sev and serve immediately — it goes soggy within minutes.",
+     "tip": "Mix it right before eating, never in advance."
+    }
+   ],
+   "substitutions": [
+    {
+     "ingredientId": "peanuts",
+     "options": [
+      "roasted chana dal",
+      "skip for a nut-free version"
+     ]
+    },
+    {
+     "ingredientId": "lemon",
+     "options": [
+      "a pinch of amchur",
+      "tamarind chutney (bhel-style)"
+     ]
+    }
+   ],
+   "weather": "any"
+  }
+ ]
+}

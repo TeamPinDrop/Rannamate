@@ -95,6 +95,3 @@ export interface Profile {
   diets: Diet[];
 }
 
-export type MealSlot = "breakfast" | "lunch" | "dinner";
-export type DayKey = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
-export type MealPlan = Partial<Record<DayKey, Partial<Record<MealSlot, string>>>>;

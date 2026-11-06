@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { OrbitField, type OrbitItem } from "./OrbitField";
 import { LogoMark } from "./Logo";
+export const INTRO_DONE_EVENT = "rannamate:intro-done";
 import { usePrefersReducedMotion, useViewportWidth } from "@/lib/useReducedMotion";
 
 const KEY = "rannamate:intro-played";
@@ -28,12 +29,15 @@ export function Preloader() {
   const done = useCallback(() => {
     try { sessionStorage.setItem(KEY, "1"); } catch { /* ignore */ }
     setShow(false);
+    window.dispatchEvent(new Event(INTRO_DONE_EVENT)); // IntroGate then opens Sign In for signed-out visitors
   }, []);
 
   useEffect(() => {
     let played = false;
     try { played = sessionStorage.getItem(KEY) === "1"; } catch { /* ignore */ }
-    setShow(!played);
+    // coming back from Google or from a password-reset email goes straight to the page (no intro)
+    const path = window.location.pathname;
+    setShow(!played && path !== "/reset-password" && path !== "/auth/callback");
   }, []);
 
   useEffect(() => {
