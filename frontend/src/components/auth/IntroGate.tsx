@@ -26,7 +26,7 @@ export function IntroGate() {
   useEffect(() => {
     if (!introDone || handled || status === "loading") return; // wait until we know who's here
     setHandled(true);
-    if (status !== "signed-in" && path === "/") router.replace("/sign-in");
+    if (status !== "signed-in" && status !== "disabled" && path === "/") router.replace("/sign-in");
   }, [introDone, handled, status, path, router]);
 
   return null;

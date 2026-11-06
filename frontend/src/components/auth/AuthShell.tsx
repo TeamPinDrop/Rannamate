@@ -2,7 +2,10 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, MotionConfig, type Variants } from "framer-motion";
+import Link from "next/link";
 import { AuthStage, AuthStageCompact, type StageMode } from "./AuthStage";
+import { useAuth } from "@/lib/auth/AuthProvider";
+import { authEnabled } from "@/lib/auth/enabled";
 
 /** order of the pages left→right, so transitions slide the way you're "moving" */
 const ORDER: Record<string, number> = { "/forgot-password": 0, "/reset-password": 0, "/sign-in": 1, "/auth/callback": 1, "/sign-up": 2 };
@@ -38,6 +41,10 @@ export function AuthShell({ children }: { children: ReactNode }) {
     window.setTimeout(() => (opts?.replace ? router.replace(href) : router.push(href)), 230);
   }, [pathname, router]);
 
+  const { status } = useAuth();
+  // decided after mount (it depends on the site's address); the forms only mount when sign-in is available
+  const [enabled, setEnabled] = useState<boolean | null>(null);
+  useEffect(() => { setEnabled(authEnabled()); }, []);
   const mode = modeOf(pathname);
   const d = dir.current;
   return (
@@ -57,13 +64,28 @@ export function AuthShell({ children }: { children: ReactNode }) {
                 animate={leaving !== null ? { opacity: 0, x: -leaving * 48, filter: "blur(8px)" } : { opacity: 1, x: 0, filter: "blur(0px)" }}
                 transition={{ duration: leaving !== null ? 0.22 : 0.5, ease: [0.22, 1, 0.36, 1] }}
               >
-                {children}
+                {enabled === false || status === "disabled" ? <AccountsComingSoon /> : enabled ? children : null}
               </motion.div>
             </main>
           </div>
         </div>
       </ShellContext.Provider>
     </MotionConfig>
+  );
+}
+
+/** shown on the auth pages of a deployment that has no backend yet — honest, and every button works */
+function AccountsComingSoon() {
+  return (
+    <div className="glass-strong glass-sheen relative rounded-[2.2rem] p-6 text-center sm:p-9">
+      <p className="eyebrow">Accounts</p>
+      <h1 className="h-display mt-2 text-[2rem] leading-[1.08] text-forest sm:text-[2.4rem]">Sign-in is <em className="text-burgundy">coming soon.</em></h1>
+      <p className="mx-auto mt-3 max-w-sm text-[15px] text-forest/75">Accounts aren&apos;t switched on for this site yet. Everything else works — your kitchen, Tastory and preferences are saved in this browser.</p>
+      <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <Link href="/" className="btn-primary">Back to the kitchen</Link>
+        <Link href="/discover" className="btn-ghost">Discover recipes</Link>
+      </div>
+    </div>
   );
 }
 

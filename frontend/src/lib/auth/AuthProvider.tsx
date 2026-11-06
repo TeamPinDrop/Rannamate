@@ -4,14 +4,16 @@ import { ApiError, onSessionChange, restoreSession, session } from "@/services/a
 import { authApi } from "@/services/endpoints";
 import type { User } from "@/services/types";
 import { actions, getState, subscribeStore } from "@/lib/store";
+import { authEnabled } from "./enabled";
 
 /**
  * loading    – checking the session cookie (first paint after a reload)
  * signed-in  – a real session confirmed by the backend
  * signed-out – no session (or it ended)
  * offline    – the backend couldn't be reached, so we honestly don't know yet
+ * disabled   – sign-in isn't available on this deployment (see lib/auth/enabled.ts)
  */
-export type AuthStatus = "loading" | "signed-in" | "signed-out" | "offline";
+export type AuthStatus = "loading" | "signed-in" | "signed-out" | "offline" | "disabled";
 
 interface AuthContextValue {
   status: AuthStatus;
@@ -45,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let alive = true;
+    if (!authEnabled()) { setStatus("disabled"); return; } // no backend for this site yet → no network calls
     restoreSession().catch((e) => {
       if (!alive) return;
       setStatus(e instanceof ApiError && e.unavailable ? "offline" : "signed-out");

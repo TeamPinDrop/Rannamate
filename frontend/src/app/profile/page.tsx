@@ -5,6 +5,7 @@ import { Heart, History } from "lucide-react";
 import { Notice, PageHeader } from "@/components/ui/PageHeader";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { AccountCard } from "@/components/auth/AccountCard";
+import { useAuth } from "@/lib/auth/AuthProvider";
 import { ALLERGENS, DIETS } from "@/lib/data/options";
 import { RECIPE_BY_ID } from "@/lib/data/recipes";
 import { actions, useStore } from "@/lib/store";
@@ -19,6 +20,7 @@ export default function ProfilePage() {
 }
 
 function ProfileContent() {
+  const { status } = useAuth();
   const profile = useStore((s) => s.profile);
   const favourites = useStore((s) => s.favourites);
   const history = useStore((s) => s.history);
@@ -28,7 +30,9 @@ function ProfileContent() {
     <div className="mx-auto max-w-5xl px-4 pb-20 pt-32 sm:px-6">
       <PageHeader eyebrow="Profile" title={<>Your <em className="text-burgundy">preferences</em></>} />
       <AccountCard />
-      <div className="mb-6"><Notice tone="info">Name, allergies and diets are saved to your account. Favourites and cooking history are still kept in this browser.</Notice></div>
+      <div className="mb-6"><Notice tone="info">{status === "disabled"
+        ? "Everything here is saved in this browser."
+        : "Name, allergies and diets are saved to your account. Favourites and cooking history are still kept in this browser."}</Notice></div>
       <div className="grid gap-6 md:grid-cols-2">
         <section className="glass-strong space-y-5 rounded-[2rem] p-6">
           <label className="block">

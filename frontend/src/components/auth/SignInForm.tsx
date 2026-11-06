@@ -9,6 +9,7 @@ import { authMessage, codeMessage, fieldErrors } from "@/lib/auth/messages";
 import { safeReturnTo, withReturnTo } from "@/lib/auth/routes";
 import { ApiError } from "@/services/api-client";
 import { authApi, type AuthProviders } from "@/services/endpoints";
+import { authEnabled } from "@/lib/auth/enabled";
 import { stagger, Rise, useAuthShell } from "./AuthShell";
 import { AuthCard, Checkbox, emailProblem, Field, GoogleButton, Notice, OrDivider, PasswordField, ShellLink, SubmitButton, type SubmitState } from "./controls";
 
@@ -17,6 +18,7 @@ export function useProviders() {
   const [failed, setFailed] = useState(false);
   useEffect(() => {
     let alive = true;
+    if (!authEnabled()) return; // no backend for this site → don't ask it anything
     authApi.providers().then((v) => alive && setP(v)).catch(() => alive && setFailed(true));
     return () => { alive = false; };
   }, []);

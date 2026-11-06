@@ -18,7 +18,8 @@ export function RequireAuth({ children }: { children: ReactNode }) {
     if (status === "signed-out") router.replace(signedOutByUser ? "/" : signInHref(`${path}${qs ? `?${qs}` : ""}`));
   }, [status, path, qs, router, signedOutByUser]);
 
-  if (status === "signed-in") return <>{children}</>;
+  // sign-in not available on this deployment → the page works as before (saved in this browser)
+  if (status === "signed-in" || status === "disabled") return <>{children}</>;
   return (
     <div className="mx-auto flex min-h-[70svh] max-w-md flex-col items-center justify-center px-6 pt-24 text-center" role="status">
       {status === "offline" ? (
