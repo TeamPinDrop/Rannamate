@@ -6,7 +6,7 @@ import type { Allergen, Cuisine, Recipe, Unit } from "./types";
 
 /**
  * Recipes invented by the live AI become first-class app recipes: they're
- * registered next to the catalog (so cook mode, favourites and the planner work)
+ * registered next to the catalog (so cook mode and favourites work)
  * and remembered in this browser. In Phase 3 they'll be saved via the backend.
  */
 const KEY = "rannamate:ai-recipes";

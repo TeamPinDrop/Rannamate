@@ -68,3 +68,16 @@ body {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
+
+/* Sign-in fields: keep browser autofill on-brand instead of bright yellow/blue */
+.auth-input:-webkit-autofill,
+.auth-input:-webkit-autofill:hover,
+.auth-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #0F3D3A;
+  -webkit-box-shadow: 0 0 0 1000px rgba(253, 247, 241, 0.92) inset;
+  transition: background-color 9999s ease-out 0s;
+  caret-color: #0F3D3A;
+}
+.auth-input:-webkit-autofill + label {
+  top: 1.05rem; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em;
+}

@@ -26,6 +26,8 @@ export function useSpeechRecognition(onFinal: (text: string) => void) {
   cb.current = onFinal;
 
   useEffect(() => setSupported(!!getRecognition()), []);
+  // release the microphone if the component using it goes away mid-sentence
+  useEffect(() => () => { const r = ref.current; if (r) { r.onresult = null; r.onerror = null; r.onend = null; try { r.abort(); } catch { /* already stopped */ } } }, []);
 
   const start = useCallback(() => {
     const Ctor = getRecognition();
@@ -155,6 +157,8 @@ export function useSpeechSynthesis() {
   }, [supported, muted, cloudVoice, useCloud, stopAll, browserSpeak]);
 
   const cancel = useCallback(() => { stopAll(); setSpeaking(false); }, [stopAll]);
+  // stop this instance's audio when its component unmounts
+  useEffect(() => () => { seq.current++; if (audioRef.current) { audioRef.current.pause(); audioRef.current.src = ""; audioRef.current = null; } }, []);
   const pause = useCallback(() => { audioRef.current?.pause(); if ("speechSynthesis" in window) window.speechSynthesis.pause(); }, []);
   const resume = useCallback(() => { audioRef.current?.play().catch(() => {}); if ("speechSynthesis" in window) window.speechSynthesis.resume(); }, []);
 

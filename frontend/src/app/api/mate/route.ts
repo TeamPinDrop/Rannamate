@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { RECIPES, RECIPE_BY_ID } from "@/lib/data/recipes";
 import { ingredient } from "@/lib/data/ingredients";
+import { callClaude, callGemini } from "@/lib/mate/llm-server";
 import { conflicts, GEMINI_SCHEMA, normaliseRecipe, type AiRecipe, type AiReply } from "@/lib/mate/ai-schema";
 
 /**
@@ -9,18 +10,11 @@ import { conflicts, GEMINI_SCHEMA, normaliseRecipe, type AiRecipe, type AiReply 
  *   GEMINI_API_KEY  (preferred)  — optional GEMINI_MODEL
  *   ANTHROPIC_API_KEY            — optional ANTHROPIC_MODEL
  * Without a key it answers 501 and the UI falls back to the offline brain.
+ * Model calls live in lib/mate/llm-server.ts (shared with /api/mate/chill).
  * In Phase 3 this logic moves behind NestJS → FastAPI unchanged.
  */
 export const dynamic = "force-dynamic";
 
-// Fast, reliable model first; others are fallbacks. A model that is slow or unreachable is skipped.
-const GEMINI_MODELS = ["gemini-3.6-flash", "gemini-3.5-flash-lite", "gemini-flash-latest", "gemini-3.8-flash"];
-const FIRST_TRY_MS = 18_000;
-/** Models that told us their quota is used up are skipped until this time (ms). */
-const cooledUntil = new Map<string, number>();
-const NEXT_TRY_MS = 10_000;
-/** Whole request must finish well before the browser gives up (35 s). */
-const BUDGET_MS = 28_000;
 
 interface Body {
   messages: { who: "user" | "mate"; text: string }[];
@@ -85,90 +79,7 @@ HOW TO ANSWER (respond with JSON matching the schema):
 - Off-topic questions: answer in one line and steer back to food.`;
 }
 
-async function callGemini(key: string, system: string, history: Body["messages"], hot: boolean, extra?: string) {
-  const models = process.env.GEMINI_MODEL ? [process.env.GEMINI_MODEL, ...GEMINI_MODELS] : GEMINI_MODELS;
-  const deadline = Date.now() + BUDGET_MS;
-  const contents = history.map((m) => ({ role: m.who === "user" ? "user" : "model", parts: [{ text: m.text }] }));
-  if (extra) contents.push({ role: "user", parts: [{ text: extra }] });
-  let lastErr = "ai_error";
-  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-  const usable = models.filter((m) => (cooledUntil.get(m) ?? 0) < Date.now());
-  for (const [i, model] of (usable.length ? usable : models).entries()) {
-    for (let attempt = 0; attempt < 2; attempt++) {
-      const left = Math.min(deadline - Date.now(), i === 0 && attempt === 0 ? FIRST_TRY_MS : NEXT_TRY_MS);
-      if (left < 3000) throw new Error(lastErr === "ai_error" ? "Gemini took too long to answer" : lastErr);
-      const t0 = Date.now();
-      let res: Response;
-      try {
-        res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-          method: "POST",
-          signal: AbortSignal.timeout(left),
-          headers: { "Content-Type": "application/json", "x-goog-api-key": key },
-          body: JSON.stringify({
-            systemInstruction: { parts: [{ text: system }] },
-            contents,
-            generationConfig: {
-              temperature: hot ? 1 : 0.8,
-              maxOutputTokens: 4096,
-              responseMimeType: "application/json",
-              responseSchema: GEMINI_SCHEMA,
-              // Gemini 3.x "thinks" before answering; a low level keeps replies fast for a voice chat
-              ...(model.startsWith("gemini-3") && attempt === 0 ? { thinkingConfig: { thinkingLevel: "low" } } : {}),
-            },
-          }),
-        });
-      } catch (e) {
-        lastErr = e instanceof Error && e.name === "TimeoutError" ? "Gemini took too long to answer" : `Can't reach Gemini (${e instanceof Error ? e.message : "network error"})`;
-        console.error(`[mate] ${model}: ${lastErr} — trying the next model`);
-        break; // next model
-      }
-      const data = await res.json().catch(() => ({}));
-      console.log(`[mate] ${model} → HTTP ${res.status} in ${Date.now() - t0} ms`);
-      if (res.ok) {
-        const text = (data.candidates?.[0]?.content?.parts ?? []).map((p: { text?: string }) => p.text ?? "").join("");
-        if (text.trim()) return { text, model };
-        lastErr = "Gemini returned an empty answer";
-        break;
-      }
-      lastErr = data?.error?.message ?? `HTTP ${res.status}`;
-      console.error(`[mate] ${model} error: ${lastErr}`);
-      // a bad key won't work on any model — stop right away
-      if ((res.status === 401 || res.status === 403 || res.status === 400) && !/not found|not supported|no longer available|model/i.test(lastErr)) throw new Error(lastErr);
-      // daily/minute quota used up → skip this model for a while instead of retrying it on every message
-      if (res.status === 429 && /quota|per day|limit/i.test(lastErr)) {
-        const wait = /per ?day|PerDay|daily/i.test(lastErr) ? 60 * 60_000 : 60_000;
-        cooledUntil.set(model, Date.now() + wait);
-        console.log(`[mate] ${model} quota reached — skipping it for ${wait / 60_000} min`);
-        break;
-      }
-      // overloaded / rate-limited → one quick retry on the same model, then move on
-      if ((res.status === 503 || res.status === 429 || res.status === 500) && attempt === 0) { await sleep(1200); continue; }
-      break;
-    }
-  }
-  throw new Error(lastErr);
-}
-
-async function callClaude(key: string, system: string, history: Body["messages"], extra?: string) {
-  const model = process.env.ANTHROPIC_MODEL || "claude-haiku-5-5";
-  const msgs = history.map((m) => ({ role: m.who === "user" ? "user" : "assistant", content: m.text }));
-  while (msgs.length && msgs[0].role !== "user") msgs.shift();
-  if (extra) msgs.push({ role: "user", content: extra });
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    signal: AbortSignal.timeout(BUDGET_MS),
-    headers: { "Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01" },
-    body: JSON.stringify({
-      model,
-      max_tokens: 2048,
-      system: `${system}\n\nRespond with ONLY a JSON object (no prose around it) with these keys: reply, suggest, focus, startCooking, goToStep, timerSeconds, timerLabel, swapFrom, swapOptions, servings, created{name,emoji,tagline,cuisine,difficulty,prepMinutes,cookMinutes,servings,ingredients[{name,quantity,unit,optional,note}],steps[{text,timerSeconds}],tip}.`,
-      messages: msgs,
-    }),
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data?.error?.message ?? `HTTP ${res.status}`);
-  return { text: (data.content ?? []).map((c: { text?: string }) => c.text ?? "").join(""), model };
-}
+const CLAUDE_JSON_HINT = "Respond with ONLY a JSON object (no prose around it) with these keys: reply, suggest, focus, startCooking, goToStep, timerSeconds, timerLabel, swapFrom, swapOptions, servings, created{name,emoji,tagline,cuisine,difficulty,prepMinutes,cookMinutes,servings,ingredients[{name,quantity,unit,optional,note}],steps[{text,timerSeconds}],tip}.";
 
 function parse(text: string): AiReply {
   if (!text.trim()) return { reply: "Hmm, my brain went blank for a second — could you say that again?" };
@@ -191,7 +102,9 @@ export async function POST(req: Request) {
   body.diets ??= [];
   const history = (body.messages ?? []).slice(-14).filter((m) => m.text?.trim());
   const system = systemPrompt(body);
-  const ask = (extra?: string) => (gemini ? callGemini(gemini, system, history, body.persona === "chatpata", extra) : callClaude(anthropic!, system, history, extra));
+  const ask = (extra?: string) => (gemini
+    ? callGemini(gemini, system, history, { schema: GEMINI_SCHEMA, temperature: body.persona === "chatpata" ? 1 : 0.8, extra })
+    : callClaude(anthropic!, system, history, { jsonHint: CLAUDE_JSON_HINT, extra }));
 
   const started = Date.now();
   try {

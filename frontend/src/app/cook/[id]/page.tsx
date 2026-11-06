@@ -4,14 +4,17 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { loadAiRecipes } from "@/lib/aiRecipes";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronLeft, ChevronRight, Heart, ListChecks, MessageCircle, Pause, Play, RotateCcw, Timer, Volume2, X } from "lucide-react";
+import { Camera, Check, ChevronLeft, ChevronRight, Heart, ListChecks, MessageCircle, Pause, Play, RotateCcw, ShieldAlert, Sparkles, Timer, Volume2, X } from "lucide-react";
 import { RECIPE_BY_ID } from "@/lib/data/recipes";
 import { ingredient } from "@/lib/data/ingredients";
 import { MatePanel } from "@/components/MatePanel";
-import { AddToPlan } from "@/components/AddToPlan";
 import { actions, useStore } from "@/lib/store";
 import type { MateAction } from "@/lib/mate-local";
 import { useSpeechSynthesis } from "@/lib/voice";
+import { useStepTimer } from "@/lib/useStepTimer";
+import { classifyStep, INVITE_MIN_SECONDS, WRAP_UP_SECONDS } from "@/lib/chill/engine";
+import { ChillInvite } from "@/components/chill/ChillInvite";
+import { CookAndChill } from "@/components/chill/CookAndChill";
 
 const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
@@ -22,12 +25,13 @@ export default function CookPage() {
   const r = ready || !id.startsWith("ai-") ? RECIPE_BY_ID[id] : undefined;
   const [step, setStep] = useState(0);
   const [checked, setChecked] = useState<Set<string>>(new Set());
-  const [panel, setPanel] = useState<"mate" | "list" | null>(null);
+  const [panel, setPanel] = useState<"mate" | "list" | "chill" | null>(null);
   const [finished, setFinished] = useState(false);
-  const [remaining, setRemaining] = useState<number | null>(null);
-  const [running, setRunning] = useState(false);
-  const [timerDone, setTimerDone] = useState(false);
-  const tick = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Cook & Chill: invitations are offered at most once per step, and can be switched off for the recipe
+  const [inviteSeen, setInviteSeen] = useState<Set<number>>(new Set());
+  const [invitesOff, setInvitesOff] = useState(false);
+  const [chillUsed, setChillUsed] = useState(false);
+  const [chillCut, setChillCut] = useState(false);
   const tts = useSpeechSynthesis();
   const fav = useStore((s) => s.favourites.includes(id));
   const ttsRef = useRef(tts);
@@ -35,49 +39,56 @@ export default function CookPage() {
 
   const s = r?.steps[step];
 
-  // reset timer when the step changes
-  useEffect(() => {
-    setRunning(false);
-    setTimerDone(false);
-    setRemaining(s?.timer ?? null);
-  }, [step, s?.timer]);
+  // one timer per step, timestamp-based (see useStepTimer) — only the user's controls change it
+  const timer = useStepTimer(s?.timer ?? null, step);
+  const { remaining, running, done: timerDone } = timer;
+  const timerRef = useRef(timer);
+  timerRef.current = timer;
+  const safety = classifyStep(s?.text ?? "", s?.timer);
+  const chillOk = safety.level === "passive" && remaining !== null;
 
+  // timer finished → entertainment stops at once, the user is brought back to the step and asked to check the food
+  const panelRef = useRef(panel);
+  panelRef.current = panel;
   useEffect(() => {
-    if (!running) { if (tick.current) clearInterval(tick.current); return; }
-    tick.current = setInterval(() => {
-      setRemaining((x) => {
-        if (x === null) return x;
-        if (x <= 1) {
-          setRunning(false);
-          setTimerDone(true);
-          ttsRef.current.speak("Time's up for this step.");
-          return 0;
-        }
-        return x - 1;
-      });
-    }, 1000);
-    return () => { if (tick.current) clearInterval(tick.current); };
-  }, [running]);
+    if (!timerDone) return;
+    if (panelRef.current === "chill") { setPanel(null); setChillCut(true); }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    // let Cook & Chill fall silent first, then announce
+    const t = setTimeout(() => ttsRef.current.speak("Time's up for this step. Please check your food yourself before moving on."), 200);
+    return () => clearTimeout(t);
+  }, [timerDone]);
+
+  // a new step (often a hands-on or hot one) always closes Cook & Chill
+  useEffect(() => {
+    setChillCut(false);
+    if (panelRef.current === "chill") setPanel(null);
+  }, [step]);
+
+  const showInvite = !!r && chillOk && running && (remaining ?? 0) >= INVITE_MIN_SECONDS && panel !== "chill" && !invitesOff && !inviteSeen.has(step);
+  const markSeen = useCallback(() => setInviteSeen((x) => new Set(x).add(step)), [step]);
+  const openChill = useCallback(() => { markSeen(); setChillUsed(true); setPanel("chill"); }, [markSeen]);
 
   const go = useCallback((d: number) => setStep((x) => Math.min(Math.max(0, x + d), (r?.steps.length ?? 1) - 1)), [r]);
 
   const onAction = useCallback((a: MateAction) => {
     if (a === "next") go(1);
     else if (a === "prev") go(-1);
-    else if (a === "start-timer") setRunning(true);
-    else if (a === "pause-timer") setRunning(false);
+    else if (a === "start-timer") timerRef.current.start();
+    else if (a === "pause-timer") timerRef.current.pause();
   }, [go]);
 
   useEffect(() => {
     const on = (e: KeyboardEvent) => {
-      if ((e.target as HTMLElement).tagName === "INPUT") return;
+      const t = e.target as HTMLElement;
+      if (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.closest?.("[data-chill]")) return;
       if (e.key === "ArrowRight") go(1);
       if (e.key === "ArrowLeft") go(-1);
-      if (e.key === " " && remaining !== null) { e.preventDefault(); setRunning((x) => !x); }
+      if (e.key === " " && timerRef.current.remaining !== null) { e.preventDefault(); timerRef.current.toggle(); }
     };
     window.addEventListener("keydown", on);
     return () => window.removeEventListener("keydown", on);
-  }, [go, remaining]);
+  }, [go]);
 
   if ((!r || !s) && !ready) return <div className="min-h-screen bg-forest" />;
   if (!r || !s) return <div className="px-4 pt-40 text-center text-forest">Recipe not found. <Link href="/discover" className="underline">Back</Link></div>;
@@ -95,7 +106,7 @@ export default function CookPage() {
           <p className="mt-2 text-cream/80">{r.name} is ready. Enjoy every bite.</p>
           <div className="mt-6 flex flex-col items-center gap-3">
             <button onClick={() => actions.toggleFavourite(r.id)} className="flex items-center gap-2 rounded-full bg-cream px-5 py-2.5 font-semibold text-burgundy"><Heart className={`h-4 w-4 ${fav ? "fill-burgundy" : ""}`} /> {fav ? "In favourites" : "Add to favourites"}</button>
-            <AddToPlan recipeId={r.id} dark />
+            <Link href={`/tastory?new=${encodeURIComponent(r.name)}`} className="flex items-center gap-2 rounded-full bg-cream/15 px-5 py-2.5 font-semibold text-cream-50 ring-1 ring-cream/30 hover:bg-cream/25"><Camera className="h-4 w-4" /> Save it to Tastory</Link>
             <Link href="/discover" className="mt-2 text-sm underline underline-offset-4">Find another recipe</Link>
           </div>
         </motion.div>
@@ -104,7 +115,7 @@ export default function CookPage() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-forest text-cream-50">
+    <div className={`relative min-h-screen overflow-clip bg-forest text-cream-50 ${panel === "chill" ? "pb-[66svh] lg:pb-0" : ""}`}>
       <div className="pointer-events-none absolute -right-32 -top-32 h-[30rem] w-[30rem] rounded-full blur-[120px]" style={{ background: r.palette[0], opacity: 0.35 }} />
       <div className="pointer-events-none absolute -bottom-32 -left-32 h-[30rem] w-[30rem] rounded-full bg-burgundy/60 blur-[120px]" />
 
@@ -139,8 +150,8 @@ export default function CookPage() {
                 <div className={`glass-dark flex items-center gap-3 rounded-full py-2 pl-5 pr-2 ${timerDone ? "ring-2 ring-cream" : ""}`}>
                   <Timer className="h-5 w-5" />
                   <span className="font-display text-3xl tabular-nums" aria-live="off">{fmt(remaining)}</span>
-                  <button onClick={() => setRunning((x) => !x)} className="flex h-10 w-10 items-center justify-center rounded-full bg-cream text-forest" aria-label={running ? "Pause timer" : "Start timer"}>{running ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}</button>
-                  <button onClick={() => { setRunning(false); setTimerDone(false); setRemaining(s.timer ?? null); }} className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-cream/15" aria-label="Reset timer"><RotateCcw className="h-4 w-4" /></button>
+                  <button onClick={timer.toggle} className="flex h-10 w-10 items-center justify-center rounded-full bg-cream text-forest" aria-label={running ? "Pause timer" : "Start timer"}>{running ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}</button>
+                  <button onClick={timer.reset} className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-cream/15" aria-label="Reset timer"><RotateCcw className="h-4 w-4" /></button>
                 </div>
               )}
 
@@ -154,9 +165,41 @@ export default function CookPage() {
                 <button onClick={() => go(1)} className="flex h-14 items-center gap-2 rounded-full bg-cream px-7 font-semibold text-burgundy hover:bg-cream-50">Next step <ChevronRight className="h-5 w-5" /></button>
               )}
             </div>
-            {timerDone && <p className="mt-4 font-semibold text-cream">⏰ Time&apos;s up for this step!</p>}
+            {/* Cook & Chill — only offered while a safe waiting step is actually timing */}
+            {r && chillOk && running && !showInvite && panel !== "chill" && (remaining ?? 0) >= WRAP_UP_SECONDS && (
+              <button onClick={openChill} className="mt-5 flex items-center gap-2 self-start rounded-full bg-cream/10 px-4 py-2 text-sm font-semibold ring-1 ring-cream/20 transition hover:bg-cream/20" data-chill>
+                <Sparkles className="h-4 w-4" /> Cook &amp; Chill while it cooks
+              </button>
+            )}
+            <ChillInvite show={showInvite} remaining={remaining ?? 0} onAccept={openChill} onLater={markSeen} onNever={() => { markSeen(); setInvitesOff(true); }} />
+
+            {timerDone && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} role="alert" className="mt-5 max-w-xl rounded-[1.5rem] bg-cream p-4 text-burgundy shadow-glass-lg">
+                <p className="font-display text-xl font-semibold">⏰ Time&apos;s up for this step!</p>
+                <p className="mt-1 text-sm text-burgundy/85">Check the food yourself — look, smell and taste before moving on. Not ready yet? Reset the timer and give it a little longer.</p>
+                {chillCut && <p className="mt-2 text-xs font-semibold text-burgundy/70">Cook &amp; Chill is paused — it&apos;ll be there during the next wait.</p>}
+              </motion.div>
+            )}
+            {chillUsed && safety.level === "critical" && (
+              <p className="mt-4 flex max-w-xl items-center gap-2 rounded-2xl bg-burgundy/50 px-4 py-2.5 text-sm text-cream-50"><ShieldAlert className="h-4 w-4 shrink-0" /> Careful — {safety.reason}. Games stay off for this step so you can focus.</p>
+            )}
             <p className="mt-8 text-xs text-cream/50">Keyboard: ← → to move between steps, space to start/pause the timer.</p>
           </section>
+
+          {/* Cook & Chill stays mounted (hidden) so a conversation survives closing the panel */}
+          <CookAndChill
+            open={panel === "chill"}
+            onClose={() => setPanel(null)}
+            onAskMate={() => setPanel("mate")}
+            recipe={r}
+            stepIndex={step}
+            stepText={s.text}
+            nextStepText={r.steps[step + 1]?.text ?? null}
+            remaining={remaining ?? 0}
+            running={running}
+            timerDone={timerDone}
+            safety={safety}
+          />
 
           <AnimatePresence mode="wait">
             {panel === "mate" && (

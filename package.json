@@ -1,11 +1,16 @@
 {
   "name": "rannamate",
   "private": true,
-  "description": "RANNAMATE monorepo root — run `npm run dev` here or inside frontend/",
+  "description": "RANNAMATE monorepo root \u2014 frontend (Next.js), backend (NestJS), ai-service (FastAPI)",
   "scripts": {
     "dev": "npm --prefix frontend run dev",
     "build": "npm --prefix frontend run build",
     "start": "npm --prefix frontend run start",
-    "install:frontend": "npm --prefix frontend install"
+    "install:frontend": "npm --prefix frontend install",
+    "install:backend": "npm --prefix backend install",
+    "dev:backend": "npm --prefix backend run dev",
+    "test:backend": "npm --prefix backend run test:all",
+    "dev:ai": "cd ai-service && .venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload",
+    "test:ai": "cd ai-service && .venv/bin/python -m pytest -q"
   }
 }

@@ -7,7 +7,7 @@ const PAGES = [
   { href: "/kitchen", emoji: "🧺", title: "My Kitchen", body: "Add what you have — by search or a photo of your fridge.", tone: "from-[#F2B33D]/40" },
   { href: "/discover", emoji: "🍽️", title: "Discover Recipes", body: "Filter by mood, cuisine, time and diet. See exactly what you're missing.", tone: "from-burgundy/30" },
   { href: "/mate", emoji: "🧑‍🍳", title: "Cooking Mate", body: "Ask by voice or text. Step-by-step help while you cook.", tone: "from-forest/30" },
-  { href: "/planner", emoji: "🗓️", title: "Meal Planner", body: "Plan the week and get one merged shopping list.", tone: "from-[#9CC56A]/40" },
+  { href: "/tastory", emoji: "📸", title: "Tastory", body: "Every dish has a story. Keep photos and notes from the meals you're proud of.", tone: "from-[#9CC56A]/40" },
 ];
 
 export function ExploreGrid() {
