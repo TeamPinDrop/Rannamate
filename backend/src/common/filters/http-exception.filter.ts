@@ -46,6 +46,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
       }
       // multer limits arrive as generic 413/400 messages
       if (status === 413) code = 'FILE_TOO_LARGE';
+    } else if (dbProblem(exception)) {
+      // MySQL down / wrong credentials / schema differs: an honest 503, never fake data; details stay in the server log
+      const p = dbProblem(exception)!;
+      this.log.error(`${req.method} ${req.path} → MySQL ${(exception as { code?: string }).code}: ${(exception as Error).message}`);
+      status = HttpStatus.SERVICE_UNAVAILABLE;
+      code = p.code;
+      message = p.message;
     } else {
       const e = exception as Error;
       this.log.error(`${req.method} ${req.path} → ${e?.name}: ${e?.message}`, e?.stack);
@@ -53,4 +60,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     res.status(status).json({ error: { code, message, ...(details !== undefined ? { details } : {}) }, statusCode: status, path: req.path, timestamp: new Date().toISOString() });
   }
+}
+
+const DB_DOWN = new Set(['ECONNREFUSED', 'ETIMEDOUT', 'ENOTFOUND', 'EHOSTUNREACH', 'PROTOCOL_CONNECTION_LOST', 'ER_ACCESS_DENIED_ERROR', 'ER_BAD_DB_ERROR', 'ER_DBACCESS_DENIED_ERROR', 'ER_CON_COUNT_ERROR']);
+const DB_SCHEMA = new Set(['ER_NO_SUCH_TABLE', 'ER_BAD_FIELD_ERROR', 'ER_TABLEACCESS_DENIED_ERROR', 'ER_COLUMNACCESS_DENIED_ERROR']);
+function dbProblem(e: unknown): { code: string; message: string } | null {
+  const c = (e as { code?: string })?.code;
+  if (!c) return null;
+  if (DB_DOWN.has(c)) return { code: 'DATABASE_UNAVAILABLE', message: "Can't reach the database right now. Please try again shortly." };
+  if (DB_SCHEMA.has(c)) return { code: 'SCHEMA_MISMATCH', message: "The database structure doesn't match what this server expects." };
+  return null;
 }

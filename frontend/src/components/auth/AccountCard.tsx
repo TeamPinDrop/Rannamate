@@ -12,6 +12,7 @@ const GOOGLE_RESULT: Record<string, { tone: "ok" | "err"; text: string }> = {
   linked: { tone: "ok", text: "Google is now connected — you can use it to sign in." },
   GOOGLE_ALREADY_LINKED: { tone: "err", text: "That Google account is already connected to a different RANNAMATE account." },
   GOOGLE_OTHER_ACCOUNT_LINKED: { tone: "err", text: "A different Google account is already connected to your account." },
+  GOOGLE_LINK_UNAVAILABLE: { tone: "err", text: "Connecting Google to an existing account isn't supported by the database yet." },
 };
 
 /** Who's signed in, how they sign in, and a real sign-out. Shown at the top of the Profile page. */

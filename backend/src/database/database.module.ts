@@ -3,12 +3,13 @@ import { APP_CONFIG, type AppConfig } from '../config/configuration';
 import { REPO } from './repositories';
 import * as mem from './memory/memory.repositories';
 import { unmapped } from './mysql/mysql.repositories';
+import { MysqlAuthSessionsRepository, MysqlPasswordResetsRepository, MysqlPasswordResetsUnavailable, MysqlUsersRepository } from './mysql/accounts.repositories';
 
-type Area = { token: symbol; memory: new () => object; area: string };
+type Area = { token: symbol; memory: new () => object; area: string; mysql?: (cfg: AppConfig) => object };
 const AREAS: Area[] = [
-  { token: REPO.users, memory: mem.MemoryUsersRepository, area: 'users & profiles (users, user_profiles)' },
-  { token: REPO.authSessions, memory: mem.MemoryAuthSessionsRepository, area: 'sign-in sessions' },
-  { token: REPO.passwordResets, memory: mem.MemoryPasswordResetsRepository, area: 'password-reset tokens' },
+  { token: REPO.users, memory: mem.MemoryUsersRepository, area: 'users & profiles', mysql: (c) => new MysqlUsersRepository(c) },
+  { token: REPO.authSessions, memory: mem.MemoryAuthSessionsRepository, area: 'sign-in sessions', mysql: (c) => new MysqlAuthSessionsRepository(c) },
+  { token: REPO.passwordResets, memory: mem.MemoryPasswordResetsRepository, area: 'password-reset tokens', mysql: (c) => (c.db.passwordResetsTable ? new MysqlPasswordResetsRepository(c) : new MysqlPasswordResetsUnavailable()) },
   { token: REPO.recipes, memory: mem.MemoryRecipesRepository, area: 'recipes (recipes, recipe_ingredients, recipe_steps, recipe_dietary_tags, recipe_allergens)' },
   { token: REPO.ingredients, memory: mem.MemoryIngredientsRepository, area: 'the ingredient catalogue' },
   { token: REPO.inventory, memory: mem.MemoryInventoryRepository, area: 'kitchen inventory (user_inventory)' },
@@ -26,7 +27,8 @@ const AREAS: Area[] = [
   providers: AREAS.map<Provider>((a) => ({
     provide: a.token,
     inject: [APP_CONFIG],
-    useFactory: (cfg: AppConfig) => (cfg.dataSource === 'memory' ? new a.memory() : unmapped(a.area, cfg)),
+    // accounts are mapped to the real schema; other areas answer 503 SCHEMA_NOT_VERIFIED until they are
+    useFactory: (cfg: AppConfig) => (cfg.dataSource === 'memory' ? new a.memory() : a.mysql && cfg.db.configured ? a.mysql(cfg) : unmapped(a.area, cfg)),
   })),
   exports: AREAS.map((a) => a.token),
 })

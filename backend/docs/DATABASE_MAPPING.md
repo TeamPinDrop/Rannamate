@@ -1,3 +1,41 @@
+# Database mapping — `ranna_mate_updated`
+
+**Status (from `schema.sql`, MySQL 8.0.46, 39 tables):** ACCOUNTS ARE MAPPED and tested against a copy of the real
+schema. Recipes, ingredients, inventory, favourites, cooking sessions and Tastory are **not mapped yet** — in
+`DATA_SOURCE=mysql` they answer `503 SCHEMA_NOT_VERIFIED` (never fake data). Full column list: `docs/SCHEMA.generated.md`.
+
+## Accounts (mapped) — `src/database/mysql/accounts.repositories.ts`
+
+| App concept | Table / column | Notes |
+|---|---|---|
+| user id | `users.user_id` | sent to the app as a string |
+| name | `users.full_name` | |
+| email (unique) | `users.email` (UNIQUE) | duplicate → `409 EMAIL_TAKEN` |
+| password | `users.password_hash` | bcrypt cost 12; `NULL` for Google-created accounts |
+| sign-in provider | `users.auth_provider` | `local` for email/password, `google` for Google-created accounts |
+| deactivated | `users.is_active = 0` | can't sign in (same generic error); sessions end |
+| language | `user_profiles.preferred_language` | `en` / `hinglish`; row created at sign-up |
+| Mate persona | `user_preferences.preference_settings` → `$.matePersona` | row created on first save |
+| allergies | `user_allergies` ⇄ `allergens.allergen_name` | names matched loosely (e.g. "Milk" = dairy, "Tree Nuts" = nuts). Rows the app doesn't list (e.g. Sesame) are never touched. A choice with no matching `allergens` row → `422 PROFILE_OPTION_NOT_IN_DATABASE`, nothing saved — the app never inserts reference data |
+| diets | `user_dietary_preferences` ⇄ `dietary_tags.tag_name` | same rules |
+| sign-in session | `user_sessions` | one row per sign-in; `refresh_token_hash` = SHA-256 of the cookie token; logout sets `revoked_at`; rotation sets `revoked_at` **and** `expires_at` to the same moment (there's no "replaced by" column — this is how a replayed old cookie is told apart from a signed-out one) |
+
+**Not in the schema, so limited:**
+- **Password reset tokens** — no table. Reset is reported as unavailable (`PASSWORD_RESET_NOT_AVAILABLE`, and the
+  Forgot-password page says so). To enable: the DB owner runs [`docs/sql/password_resets.sql`](sql/password_resets.sql)
+  and sets `DB_PASSWORD_RESETS_TABLE=password_resets` (plus SMTP). The backend itself never runs DDL.
+- **Google account id** — no column. Google sign-in works for accounts *created* with Google (matched by the
+  verified email + `auth_provider='google'`); connecting Google to an existing password account isn't possible until
+  a column for the Google id exists.
+- Unused here: `role`, `is_verified`, `profile_image_key`, `cooking_level`, `measurement_unit`, `preferred_servings`,
+  device/IP columns of `user_sessions` (left NULL).
+
+**App database user:** grant only `SELECT, INSERT, UPDATE, DELETE` on `ranna_mate_updated.*`.
+
+---
+
+_Earlier notes (before the schema was available) follow._
+
 # `ranna_mate` database mapping
 
 **Status: NOT VERIFIED.** No SQL export, Workbench model or connection details were available, so no column

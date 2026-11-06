@@ -11,7 +11,7 @@ export interface AppConfig {
   port: number;
   corsOrigins: string[];
   dataSource: DataSource;
-  db: { host: string; port: number; username: string; password: string; database: string; configured: boolean };
+  db: { host: string; port: number; username: string; password: string; database: string; configured: boolean; passwordResetsTable: string };
   jwt: { secret: string; refreshSecret: string; accessTtl: string; refreshTtl: string; sessionTtl: string };
   /** where the browser app lives (reset links, Google redirects) and how auth cookies are set */
   web: { appUrl: string; apiPublicUrl: string };
@@ -75,6 +75,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   const gSecret = str(env.GOOGLE_CLIENT_SECRET);
   if (!!gId !== !!gSecret) problems.push('Set both GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET, or neither');
 
+  const resetsTable = str(env.DB_PASSWORD_RESETS_TABLE);
+  if (resetsTable && !/^[A-Za-z_][A-Za-z0-9_]{0,63}$/.test(resetsTable)) problems.push('DB_PASSWORD_RESETS_TABLE must be a plain table name');
+
   if (problems.length) throw new ConfigError(`Invalid backend configuration:\n  - ${problems.join('\n  - ')}\nSee backend/.env.example.`);
 
   const host = str(env.DB_HOST);
@@ -89,7 +92,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     port,
     corsOrigins,
     dataSource,
-    db: { host, port: Number(env.DB_PORT) || 3306, username, password: env.DB_PASSWORD ?? '', database: str(env.DB_DATABASE, 'ranna_mate'), configured: !!(host && username) },
+    db: { host, port: Number(env.DB_PORT) || 3306, username, password: env.DB_PASSWORD ?? '', database: str(env.DB_DATABASE, 'ranna_mate'), configured: !!(host && username), passwordResetsTable: resetsTable },
     // refreshTtl = "Remember me" sessions; sessionTtl = sessions that end when the browser closes (server-side cap)
     jwt: { secret, refreshSecret, accessTtl: str(env.JWT_ACCESS_TTL, '15m'), refreshTtl: str(env.JWT_REFRESH_TTL, '30d'), sessionTtl: str(env.SESSION_TTL, '12h') },
     web: { appUrl, apiPublicUrl },

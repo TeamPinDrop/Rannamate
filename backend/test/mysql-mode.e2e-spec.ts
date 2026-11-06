@@ -10,7 +10,7 @@ describe('DATA_SOURCE=mysql without a connection', () => {
 
   it('health says the database is not configured', async () => {
     const r = await request(app.getHttpServer()).get('/api/v1/health').expect(200);
-    expect(r.body.data.dataSource).toMatchObject({ mode: 'mysql', status: 'not_configured', schema: 'not_verified' });
+    expect(r.body.data.dataSource).toMatchObject({ mode: 'mysql', status: 'not_configured' });
     expect(r.body.data.aiService.configured).toBe(false);
   });
 
@@ -38,8 +38,15 @@ describe('DATA_SOURCE=mysql with credentials but unmapped schema', () => {
   let app: INestApplication;
   beforeAll(async () => { app = await bootApp({ DATA_SOURCE: 'mysql', DB_HOST: '127.0.0.1', DB_PORT: '1', DB_USERNAME: 'placeholder' }); });
   afterAll(async () => { await app?.close(); });
-  it('returns SCHEMA_NOT_VERIFIED rather than guessing columns', async () => {
+  it('returns SCHEMA_NOT_VERIFIED for areas not mapped yet, rather than guessing columns', async () => {
     const r = await request(app.getHttpServer()).get('/api/v1/recipes').expect(503);
     expect(r.body.error.code).toBe('SCHEMA_NOT_VERIFIED');
+  });
+  it('accounts are mapped: an unreachable server is an honest 503 DATABASE_UNAVAILABLE', async () => {
+    const { browserClient } = await import('./helpers');
+    const b = await browserClient(app.getHttpServer());
+    const r = await b.post('/auth/login', { email: 'a@b.com', password: 'abcdefg1' }).expect(503);
+    expect(r.body.error.code).toBe('DATABASE_UNAVAILABLE');
+    expect(JSON.stringify(r.body)).not.toMatch(/127\.0\.0\.1|ECONNREFUSED|placeholder/);
   });
 });

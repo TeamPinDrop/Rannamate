@@ -19,6 +19,7 @@ Interactive docs (OpenAPI / Swagger UI) are served by the running backend at **`
 | HTTP | code | meaning |
 |---|---|---|
 | 400 | `VALIDATION_FAILED`, `INVALID_ID`, `STEP_OUT_OF_RANGE`, `PHOTO_REQUIRED`, `TOO_MANY_PHOTOS`, `DATE_IN_FUTURE`, `UNKNOWN_INGREDIENT`, `UNKNOWN_RECIPE`, `INVALID_IMAGE` | bad input |
+| 422 | `PROFILE_OPTION_NOT_IN_DATABASE` | an allergy/diet has no row in the database's reference table (nothing saved) |
 | 400 | `RESET_TOKEN_INVALID` | reset link expired, already used or unknown |
 | 401 | `UNAUTHORIZED`, `INVALID_TOKEN`, `TOKEN_EXPIRED`, `SESSION_ENDED`, `INVALID_CREDENTIALS`, `NO_SESSION`, `INVALID_REFRESH_TOKEN`, `REFRESH_RACE`, `REFRESH_TOKEN_REUSED`, `REFRESH_TOKEN_EXPIRED`, `INVALID_LINK_TICKET` | sign-in problems (`TOKEN_EXPIRED` → call `/auth/refresh`; `REFRESH_RACE` → retry once) |
 | 403 | `FORBIDDEN`, `CSRF_FAILED` | expired / forged photo link · missing or wrong CSRF token / foreign Origin |
@@ -28,7 +29,7 @@ Interactive docs (OpenAPI / Swagger UI) are served by the running backend at **`
 | 413 / 415 | `FILE_TOO_LARGE` / `UNSUPPORTED_MEDIA_TYPE` | upload problems (type is checked from the file's bytes) |
 | 429 | `RATE_LIMITED` | slow down |
 | 502 | `EMAIL_DELIVERY_FAILED`, `AI_SERVICE_ERROR`, `AI_INVALID_OUTPUT`, `AI_SERVICE_AUTH_FAILED` | the AI answered badly — nothing is invented |
-| 503 | `EMAIL_NOT_CONFIGURED`, `DATABASE_NOT_CONFIGURED`, `SCHEMA_NOT_VERIFIED`, `AI_SERVICE_NOT_CONFIGURED`, `AI_PROVIDER_NOT_CONFIGURED`, `AI_SERVICE_UNREACHABLE`, `AI_SERVICE_TIMEOUT`, `STORAGE_NOT_CONFIGURED` | a dependency isn't available |
+| 503 | `EMAIL_NOT_CONFIGURED`, `PASSWORD_RESET_NOT_AVAILABLE`, `DATABASE_UNAVAILABLE`, `SCHEMA_MISMATCH`, `DATABASE_NOT_CONFIGURED`, `SCHEMA_NOT_VERIFIED`, `AI_SERVICE_NOT_CONFIGURED`, `AI_PROVIDER_NOT_CONFIGURED`, `AI_SERVICE_UNREACHABLE`, `AI_SERVICE_TIMEOUT`, `STORAGE_NOT_CONFIGURED` | a dependency isn't available |
 
 ## Endpoints
 
