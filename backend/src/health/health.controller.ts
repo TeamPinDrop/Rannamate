@@ -14,7 +14,7 @@ export class HealthController {
   async health() {
     const db = this.cfg.dataSource === 'memory'
       ? { mode: 'memory', status: 'temporary in-memory store — data is lost on restart' }
-      : { mode: 'mysql', database: this.cfg.db.database, status: this.cfg.db.configured ? await pingDatabase(this.cfg) : 'not_configured', schema: 'not_verified' };
+      : { mode: 'mysql', database: this.cfg.db.database, status: this.cfg.db.configured ? await pingDatabase(this.cfg) : 'not_configured', schema: { mapped: ['users', 'user_profiles', 'user_preferences', 'user_allergies', 'user_dietary_preferences', 'user_sessions'], pending: 'recipes, ingredients, inventory, favourites, cooking sessions, Tastory' } };
     return {
       status: 'ok',
       version: process.env.npm_package_version ?? '0.1.0',

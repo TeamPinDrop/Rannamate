@@ -37,7 +37,7 @@ export interface Recipe {
 }
 
 /** passwordHash is null for accounts created with Google that never set a password */
-export interface User { id: string; email: string; passwordHash: string | null; googleSub: string | null; createdAt: string; updatedAt: string }
+export interface User { id: string; email: string; passwordHash: string | null; googleSub: string | null; active: boolean; createdAt: string; updatedAt: string }
 /** Password-reset token: only a SHA-256 hash is stored; single use; expires. */
 export interface PasswordReset { id: string; userId: string; tokenHash: string; expiresAt: string; usedAt: string | null; createdAt: string }
 export interface Profile {

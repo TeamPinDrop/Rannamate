@@ -15,3 +15,8 @@ next-env.d.ts
 .DS_Store
 .vscode/
 *.log
+.vercel
+
+# database structure exports (keep local)
+/schema.sql
+backend/docs/SCHEMA.generated.*

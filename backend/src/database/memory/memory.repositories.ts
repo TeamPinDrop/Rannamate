@@ -25,16 +25,16 @@ export class MemoryUsersRepository implements UsersRepository {
   private profiles = new Map<string, Profile>();
   async findById(id: string) { return clone(this.users.get(id) ?? null); }
   async findByEmail(email: string) { return clone([...this.users.values()].find((u) => u.email === email) ?? null); }
-  async findByGoogleSub(sub: string) { return clone([...this.users.values()].find((u) => u.googleSub === sub) ?? null); }
+  async findByGoogle(sub: string) { return clone([...this.users.values()].find((u) => u.googleSub === sub) ?? null); }
   async create(i: { email: string; passwordHash: string | null; displayName: string; googleSub?: string | null }) {
     if ([...this.users.values()].some((u) => u.email === i.email)) throw Errors.conflict('EMAIL_TAKEN', 'An account with this email already exists.');
-    const u: User = { id: randomUUID(), email: i.email, passwordHash: i.passwordHash, googleSub: i.googleSub ?? null, createdAt: now(), updatedAt: now() };
+    const u: User = { id: randomUUID(), email: i.email, passwordHash: i.passwordHash, googleSub: i.googleSub ?? null, active: true, createdAt: now(), updatedAt: now() };
     this.users.set(u.id, u);
     this.profiles.set(u.id, { userId: u.id, displayName: i.displayName, allergies: [], diets: [], preferredLanguage: 'en', matePersona: 'masala', updatedAt: now() });
     return clone(u);
   }
   async setPasswordHash(userId: string, passwordHash: string) { const u = this.users.get(userId); if (u) { u.passwordHash = passwordHash; u.updatedAt = now(); } }
-  async linkGoogle(userId: string, googleSub: string) { const u = this.users.get(userId); if (u) { u.googleSub = googleSub; u.updatedAt = now(); } }
+  async linkGoogle(userId: string, googleSub: string) { const u = this.users.get(userId); if (u) { u.googleSub = googleSub; u.updatedAt = now(); } return true; }
   async getProfile(userId: string) { return clone(this.profiles.get(userId) ?? null); }
   async updateProfile(userId: string, patch: Partial<Profile>) {
     const p = { ...this.profiles.get(userId)!, ...patch, userId, updatedAt: now() };
@@ -45,13 +45,15 @@ export class MemoryUsersRepository implements UsersRepository {
 
 export class MemoryAuthSessionsRepository implements AuthSessionsRepository {
   private rows = new Map<string, AuthSession>();
-  async create(s: Omit<AuthSession, 'createdAt' | 'revokedAt'>) { const r = { ...s, revokedAt: null, createdAt: now() }; this.rows.set(s.id, r); return clone(r); }
+  async create(s: { userId: string; tokenHash: string; expiresAt: string }) { const r: AuthSession = { id: randomUUID(), ...s, replacedBy: null, revokedAt: null, createdAt: now() }; this.rows.set(r.id, r); return clone(r); }
   async findById(id: string) { return clone(this.rows.get(id) ?? null); }
+  async findByTokenHash(h: string) { return clone([...this.rows.values()].find((r) => r.tokenHash === h) ?? null); }
   async revoke(id: string, replacedBy: string | null = null) { const r = this.rows.get(id); if (r && !r.revokedAt) { r.revokedAt = now(); r.replacedBy = replacedBy; } }
   async revokeAllForUser(userId: string) { for (const r of this.rows.values()) if (r.userId === userId && !r.revokedAt) r.revokedAt = now(); }
 }
 
 export class MemoryPasswordResetsRepository implements PasswordResetsRepository {
+  readonly available = true;
   private rows = new Map<string, PasswordReset>();
   async create(r: Omit<PasswordReset, 'createdAt' | 'usedAt'>) { const row = { ...r, usedAt: null, createdAt: now() }; this.rows.set(r.id, row); return clone(row); }
   async findByTokenHash(h: string) { return clone([...this.rows.values()].find((r) => r.tokenHash === h) ?? null); }

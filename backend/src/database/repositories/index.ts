@@ -15,23 +15,29 @@ export interface RecipeQuery {
 export interface UsersRepository {
   findById(id: string): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
-  findByGoogleSub(sub: string): Promise<User | null>;
+  /** the account that signs in with this Google identity (MySQL: auth_provider='google' + the verified email) */
+  findByGoogle(sub: string, email: string): Promise<User | null>;
   /** must fail with a conflict if the email already exists (unique index in MySQL) */
   create(input: { email: string; passwordHash: string | null; displayName: string; googleSub?: string | null }): Promise<User>;
   setPasswordHash(userId: string, passwordHash: string): Promise<void>;
-  linkGoogle(userId: string, googleSub: string): Promise<void>;
+  /** connect Google to an existing account; false when the database can't record it */
+  linkGoogle(userId: string, googleSub: string): Promise<boolean>;
   getProfile(userId: string): Promise<Profile | null>;
   updateProfile(userId: string, patch: Partial<Omit<Profile, 'userId' | 'updatedAt'>>): Promise<Profile>;
 }
 
 export interface AuthSessionsRepository {
-  create(s: Omit<AuthSession, 'createdAt' | 'revokedAt'>): Promise<AuthSession>;
+  /** the repository assigns the id (MySQL: AUTO_INCREMENT user_session_id) */
+  create(s: { userId: string; tokenHash: string; expiresAt: string }): Promise<AuthSession>;
   findById(id: string): Promise<AuthSession | null>;
+  findByTokenHash(tokenHash: string): Promise<AuthSession | null>;
   revoke(id: string, replacedBy?: string | null): Promise<void>;
   revokeAllForUser(userId: string): Promise<void>;
 }
 
 export interface PasswordResetsRepository {
+  /** false when the database has no table for reset tokens (the app then says reset isn't available) */
+  readonly available: boolean;
   create(r: Omit<PasswordReset, 'createdAt' | 'usedAt'>): Promise<PasswordReset>;
   findByTokenHash(tokenHash: string): Promise<PasswordReset | null>;
   /** atomically marks the token used; returns false if it was already used (single use) */

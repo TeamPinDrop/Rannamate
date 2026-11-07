@@ -7,6 +7,7 @@ import { useDraftField } from "@/lib/auth/draft";
 import { authMessage } from "@/lib/auth/messages";
 import { safeReturnTo, withReturnTo } from "@/lib/auth/routes";
 import { authApi } from "@/services/endpoints";
+import { ApiError } from "@/services/api-client";
 import { stagger, Rise, useAuthShell } from "./AuthShell";
 import { AuthCard, emailProblem, Field, Notice, PasswordField, passwordProblem, PasswordStrength, ShellLink, SubmitButton, type SubmitState } from "./controls";
 import { useProviders } from "./SignInForm";
@@ -77,7 +78,7 @@ export function ForgotPasswordForm() {
             // honest: no email service → no "send" button that would pretend to work
             <motion.div key="off" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-4 rounded-2xl bg-white/50 p-5 ring-1 ring-white/80">
               <p className="font-display text-lg font-semibold text-forest">Password reset by email isn&apos;t available yet</p>
-              <p className="mt-1.5 text-sm leading-relaxed text-forest/75">This RANNAMATE server doesn&apos;t have an email service set up, so it can&apos;t send reset links. Please contact the site owner, or try again later.</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-forest/75">Password reset isn&apos;t set up on this RANNAMATE server yet, so no reset link can be sent. Please contact the site owner, or try again later.</p>
             </motion.div>
           ) : sent ? (
             <motion.div key="sent" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} className="mt-4 rounded-2xl bg-forest/[0.07] p-5 ring-1 ring-forest/15" role="status">
@@ -112,7 +113,7 @@ export function ResetPasswordForm() {
   const params = useSearchParams();
   const token = params.get("token") ?? "";
   const { go } = useAuthShell();
-  const [check, setCheck] = useState<"checking" | "valid" | "invalid" | "offline">("checking");
+  const [check, setCheck] = useState<"checking" | "valid" | "invalid" | "offline" | "unavailable">("checking");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -123,7 +124,7 @@ export function ResetPasswordForm() {
 
   useEffect(() => {
     if (!/^[A-Za-z0-9_-]{40,64}$/.test(token)) { setCheck("invalid"); return; }
-    authApi.checkResetToken(token).then((r) => setCheck(r.valid ? "valid" : "invalid")).catch(() => setCheck("offline"));
+    authApi.checkResetToken(token).then((r) => setCheck(r.valid ? "valid" : "invalid")).catch((e) => setCheck(e instanceof ApiError && e.code === "PASSWORD_RESET_NOT_AVAILABLE" ? "unavailable" : "offline"));
   }, [token]);
 
   const pErr = submitted || password ? passwordProblem(password) : null;
@@ -158,6 +159,7 @@ export function ResetPasswordForm() {
         <div className="mt-6 space-y-3"><AnimatePresence>{error && <Notice tone="error">{error}</Notice>}</AnimatePresence></div>
 
         {check === "checking" && <div className="mt-4 h-40 animate-pulse rounded-2xl bg-white/40" aria-label="Checking your link" />}
+        {check === "unavailable" && <Notice tone="warn">Password reset isn&apos;t set up on this server, so this link can&apos;t be used.</Notice>}
         {check === "offline" && <Notice tone="warn">Can&apos;t reach the RANNAMATE server to check this link. Please try again once it&apos;s running.</Notice>}
         {check === "invalid" && (
           <div className="mt-4 rounded-2xl bg-white/50 p-5 ring-1 ring-white/80">
