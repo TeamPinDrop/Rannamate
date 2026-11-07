@@ -20,7 +20,7 @@ async function bootstrap() {
   const log = new Logger('RANNAMATE');
   log.log(`API      http://localhost:${cfg.port}/api/v1`);
   log.log(`Docs     http://localhost:${cfg.port}/api/docs`);
-  log.log(`Data     ${cfg.dataSource}${cfg.dataSource === 'mysql' ? (cfg.db.configured ? ' (configured — schema not yet mapped)' : ' (NOT configured — database endpoints return 503)') : ' (temporary, in-memory)'}`);
+  log.log(`Data     ${cfg.dataSource}${cfg.dataSource === 'mysql' ? (cfg.db.configured ? ` ${cfg.db.database} — accounts mapped; recipes, kitchen, favourites, sessions & Tastory not yet` : ' (NOT configured — database endpoints return 503)') : ' (temporary, in-memory)'}`);
   log.log(`AI       ${cfg.ai.configured ? cfg.ai.url : 'not configured'}`);
   log.log(`Storage  ${cfg.storage.provider || 'not configured'}`);
   log.log(`Email    ${cfg.mail.configured ? `SMTP ${cfg.mail.host}` : 'not configured (password-reset emails are refused with 503, never faked)'}`);
