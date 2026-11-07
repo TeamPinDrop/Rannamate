@@ -17,6 +17,8 @@ export function getPool(cfg: AppConfig): Pool {
       charset: 'utf8mb4_unicode_ci', connectionLimit: 10, waitForConnections: true, namedPlaceholders: true,
       dateStrings: true, supportBigNumbers: true, bigNumberStrings: true,
     });
+    // TIMESTAMP columns are read and written in UTC; DATETIME values are always passed in as UTC by the repositories
+    pool.on('connection', (c) => { c.query("SET time_zone = '+00:00'"); });
   }
   return pool;
 }

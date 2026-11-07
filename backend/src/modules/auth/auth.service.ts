@@ -52,7 +52,7 @@ export class AuthService {
   ) {}
 
   providers() {
-    return { password: true, google: this.google.configured, passwordReset: this.mail.configured };
+    return { password: true, google: this.google.configured, passwordReset: this.mail.configured && this.resets.available };
   }
 
   // ───────────────────────── email + password ─────────────────────────
@@ -67,15 +67,16 @@ export class AuthService {
     const user = await this.users.findByEmail(email);
     // Google-only accounts (no password) fail exactly like a wrong password
     const ok = await compare(password, user?.passwordHash ?? (await dummy()));
-    if (!user || !user.passwordHash || !ok) throw Errors.unauthorized('INVALID_CREDENTIALS', 'Incorrect email or password.');
+    // deactivated accounts (users.is_active = 0) fail the same generic way
+    if (!user || !user.passwordHash || !ok || !user.active) throw Errors.unauthorized('INVALID_CREDENTIALS', 'Incorrect email or password.');
     return { user: await this.usersService.me(user.id), session: await this.issue(user, remember) };
   }
 
   async refresh(refreshToken: string | null) {
     if (!refreshToken) throw Errors.unauthorized('NO_SESSION', 'Please sign in.');
     const p = await this.verifyRefresh(refreshToken);
-    const session = await this.sessions.findById(p.jti);
-    if (!session || session.userId !== p.sub || session.tokenHash !== sha256(refreshToken)) throw Errors.unauthorized('INVALID_REFRESH_TOKEN', 'Please sign in again.');
+    const session = await this.sessions.findByTokenHash(sha256(refreshToken));
+    if (!session || session.userId !== p.sub) throw Errors.unauthorized('INVALID_REFRESH_TOKEN', 'Please sign in again.');
     if (session.revokedAt) {
       if (session.replacedBy && Date.now() - new Date(session.revokedAt).getTime() < REFRESH_RACE_MS) {
         // another tab rotated this cookie a moment ago; the browser already holds the new one
@@ -90,7 +91,7 @@ export class AuthService {
     }
     if (new Date(session.expiresAt) < new Date()) throw Errors.unauthorized('REFRESH_TOKEN_EXPIRED', 'Your session expired. Please sign in again.');
     const user = await this.users.findById(session.userId);
-    if (!user) throw Errors.unauthorized('INVALID_REFRESH_TOKEN', 'Please sign in again.');
+    if (!user || !user.active) { await this.sessions.revoke(session.id); throw Errors.unauthorized('SESSION_ENDED', 'Please sign in again.'); }
     const issued = await this.issue(user, p.rem === true, (newId) => this.sessions.revoke(session.id, newId));
     return { user: await this.usersService.me(user.id), session: issued };
   }
@@ -99,9 +100,9 @@ export class AuthService {
   async logout(refreshToken: string | null) {
     if (!refreshToken) return;
     try {
-      const p = await this.verifyRefresh(refreshToken);
-      const s = await this.sessions.findById(p.jti);
-      if (s && s.tokenHash === sha256(refreshToken)) await this.sessions.revoke(s.id);
+      await this.verifyRefresh(refreshToken);
+      const s = await this.sessions.findByTokenHash(sha256(refreshToken));
+      if (s) await this.sessions.revoke(s.id);
     } catch { /* already invalid */ }
   }
 
@@ -113,6 +114,7 @@ export class AuthService {
    */
   async forgotPassword(email: string) {
     this.mail.assertConfigured();
+    if (!this.resets.available) throw Errors.unavailable('PASSWORD_RESET_NOT_AVAILABLE', "Password reset isn't available yet: the database has no table for reset links. (Server admin: see backend/docs/DATABASE_MAPPING.md → password resets.)");
     const user = await this.users.findByEmail(email);
     if (user) {
       const last = await this.resets.latestForUser(user.id);
@@ -201,17 +203,18 @@ export class AuthService {
       return fail(e instanceof GoogleOAuthError ? e.code : 'GOOGLE_FAILED', st.returnTo);
     }
 
-    const linked = await this.users.findByGoogleSub(id.sub);
+    const linked = await this.users.findByGoogle(id.sub, id.email);
     if (st.linkUserId) {
       if (linked && linked.id !== st.linkUserId) return { redirect: `${this.cfg.web.appUrl}/profile?google=GOOGLE_ALREADY_LINKED` };
       const me = await this.users.findById(st.linkUserId);
       if (!me) return fail('GOOGLE_FAILED');
       if (me.googleSub && me.googleSub !== id.sub) return { redirect: `${this.cfg.web.appUrl}/profile?google=GOOGLE_OTHER_ACCOUNT_LINKED` };
-      await this.users.linkGoogle(me.id, id.sub);
+      if (!(await this.users.linkGoogle(me.id, id.sub))) return { redirect: `${this.cfg.web.appUrl}/profile?google=GOOGLE_LINK_UNAVAILABLE` };
       return { redirect: `${this.cfg.web.appUrl}/profile?google=linked` };
     }
 
     let user: User | null = linked;
+    if (user && !user.active) return fail('GOOGLE_FAILED', st.returnTo);
     if (!user) {
       const byEmail = await this.users.findByEmail(id.email);
       if (byEmail) return fail('GOOGLE_EMAIL_EXISTS', st.returnTo);
@@ -226,21 +229,21 @@ export class AuthService {
   private async verifyRefresh(token: string) {
     try {
       const p = await this.jwt.verifyAsync<{ sub: string; jti: string; typ: string; rem?: boolean }>(token, { secret: this.cfg.jwt.refreshSecret, algorithms: ['HS256'] });
-      if (p.typ !== 'refresh' || !p.jti) throw new Error();
+      if (p.typ !== 'refresh') throw new Error();
       return p;
     } catch {
       throw Errors.unauthorized('INVALID_REFRESH_TOKEN', 'Please sign in again.');
     }
   }
 
-  private async issue(user: User, remember: boolean, beforeCreate?: (newSessionId: string) => Promise<void>): Promise<IssuedSession> {
-    const sid = randomUUID();
+  /** new session row (only the refresh token's SHA-256 is stored), then an access token bound to its id */
+  private async issue(user: User, remember: boolean, afterCreate?: (newSessionId: string) => Promise<void>): Promise<IssuedSession> {
     const accessTtl = ttlSeconds(this.cfg.jwt.accessTtl);
     const refreshTtl = ttlSeconds(remember ? this.cfg.jwt.refreshTtl : this.cfg.jwt.sessionTtl);
-    const accessToken = await this.jwt.signAsync({ sub: user.id, email: user.email, sid, typ: 'access' }, { secret: this.cfg.jwt.secret, expiresIn: accessTtl, algorithm: 'HS256' });
-    const refreshToken = await this.jwt.signAsync({ sub: user.id, typ: 'refresh', rem: remember }, { secret: this.cfg.jwt.refreshSecret, expiresIn: refreshTtl, jwtid: sid, algorithm: 'HS256' });
-    await beforeCreate?.(sid);
-    await this.sessions.create({ id: sid, userId: user.id, tokenHash: sha256(refreshToken), expiresAt: new Date(Date.now() + refreshTtl * 1000).toISOString(), replacedBy: null });
+    const refreshToken = await this.jwt.signAsync({ sub: user.id, typ: 'refresh', rem: remember }, { secret: this.cfg.jwt.refreshSecret, expiresIn: refreshTtl, jwtid: randomUUID(), algorithm: 'HS256' });
+    const s = await this.sessions.create({ userId: user.id, tokenHash: sha256(refreshToken), expiresAt: new Date(Date.now() + refreshTtl * 1000).toISOString() });
+    await afterCreate?.(s.id);
+    const accessToken = await this.jwt.signAsync({ sub: user.id, email: user.email, sid: s.id, typ: 'access' }, { secret: this.cfg.jwt.secret, expiresIn: accessTtl, algorithm: 'HS256' });
     return { accessToken, expiresIn: accessTtl, refreshToken, remember, refreshMaxAgeMs: refreshTtl * 1000 };
   }
 }

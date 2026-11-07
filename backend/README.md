@@ -13,9 +13,9 @@ Browser (Next.js frontend)  ──HTTPS──▶  NestJS backend  /api/v1  ─�
 - The AI service has **no database access**; the backend sends it only the context it needs.
 - Photos are never stored in MySQL — they go to private storage and are served through short-lived signed links.
 
-> **Database status:** the `ranna_mate` schema hasn't been provided yet, so MySQL repositories are deliberately
-> **not written** (they answer `503 SCHEMA_NOT_VERIFIED`). Use `DATA_SOURCE=memory` to run everything locally.
-> See [docs/DATABASE_MAPPING.md](docs/DATABASE_MAPPING.md) for exactly what's needed.
+> **Database status:** accounts (sign-up, sign-in, sessions, profile, allergies, diets) are mapped to the real
+> `ranna_mate_updated` schema and tested against MySQL 8. Recipes, kitchen, favourites, cooking sessions and Tastory
+> are not mapped yet (they answer `503 SCHEMA_NOT_VERIFIED` in MySQL mode). See [docs/DATABASE_MAPPING.md](docs/DATABASE_MAPPING.md).
 
 ## Quick start (local development)
 
@@ -120,7 +120,8 @@ Helmet headers · httpOnly session cookie + CSRF double-submit token + Origin ch
 | `CORS_ORIGINS` | | `http://localhost:3000,http://localhost:3001` | Allowed browser origins |
 | `DATA_SOURCE` | | `mysql` | `mysql` or `memory` (development/tests only) |
 | `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` | for MySQL | port 3306 | Connection (left blank until provided) |
-| `DB_DATABASE` | | `ranna_mate` | Existing database |
+| `DB_DATABASE` | | `ranna_mate` | Existing database (yours: `ranna_mate_updated`) |
+| `DB_PASSWORD_RESETS_TABLE` | | — | Set only after `docs/sql/password_resets.sql` was run by the DB owner |
 | `JWT_SECRET`, `JWT_REFRESH_SECRET` | **yes** | — | ≥ 32 chars, different from each other |
 | `JWT_ACCESS_TTL`, `JWT_REFRESH_TTL`, `SESSION_TTL` | | `15m`, `30d`, `12h` | Access token · "remember me" session · browser-session limit |
 | `APP_URL`, `API_PUBLIC_URL` | | first CORS origin, `http://localhost:PORT` | Website URL (reset links, Google return) · public API URL |
@@ -144,6 +145,8 @@ Recommendation weights (configurable, not fixed truths): ingredient availability
 ```bash
 npm test            # unit: recommender, safety classifier, scanner matching, image validation, config, schema parser
 npm run test:e2e    # HTTP end-to-end against the in-memory store + a test-only fake AI service
+# against a TEST COPY of the real schema (never production):
+MYSQL_TEST_HOST=127.0.0.1 MYSQL_TEST_USER=… MYSQL_TEST_PASSWORD=… MYSQL_TEST_DATABASE=… npm run test:e2e
 npm run test:all
 npm run typecheck
 ```
