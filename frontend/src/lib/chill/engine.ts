@@ -88,6 +88,7 @@ const ACTIVE: [RegExp, string][] = [
   [/\bhigh heat\b/i, "cooking on high heat"],
   [/\b(stir|whisk)(ring)? (continuously|constantly|non-stop)\b|\bkeep stirring\b/i, "constant stirring"],
   [/\bscramble/i, "scrambling"],
+  [/\bsaut[eé](e?d|ing)?(?![a-z])/i, "sautéing (needs regular stirring)"],
 ];
 
 /**
