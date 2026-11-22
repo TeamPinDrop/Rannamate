@@ -16,5 +16,7 @@ export function authEnabled(): boolean {
   if (flag === "false") return false;
   const apiIsLocal = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/|$)/.test(API_URL);
   if (!apiIsLocal) return true;
-  return typeof window !== "undefined" && ["localhost", "127.0.0.1"].includes(window.location.hostname);
+  if (typeof window === "undefined") return false;
+  const h = window.location.hostname;
+  return ["localhost", "127.0.0.1"].includes(h) || /^192\.168\./.test(h) || /^10\./.test(h) || /^172\.(1[6-9]|2\d|3[01])\./.test(h) || h.endsWith(".local");
 }

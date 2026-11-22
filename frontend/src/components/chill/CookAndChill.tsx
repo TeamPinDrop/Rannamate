@@ -98,10 +98,10 @@ export function CookAndChill({ open, onClose, onAskMate, recipe, stepIndex, step
     if (!wasOpen.current && open) { setPaused(false); setMinimized(false); }
     wasOpen.current = open;
   }, [open, halt]);
-  useEffect(() => { if (timerDone || safety.level !== "passive") halt(); }, [timerDone, safety.level, halt]);
+  useEffect(() => { if (timerDone) halt(); }, [timerDone, halt]);
 
-  const wrap = remaining < WRAP_UP_SECONDS;
-  const canStartNew = !timerDone && !wrap && safety.level === "passive";
+  const wrap = running && remaining > 0 && remaining < WRAP_UP_SECONDS;
+  const canStartNew = !timerDone && !wrap;
 
   // gentle heads-up when the timer is nearly done
   useEffect(() => {
@@ -310,11 +310,27 @@ export function CookAndChill({ open, onClose, onAskMate, recipe, stepIndex, step
                 <Trophies stats={stats} unlocked={unlocked.map((u) => u.id)} showPoints={showPoints} onClose={() => setTrophies(false)} />
               ) : !activity ? (
                 <div>
-                  <p className="mb-3 text-[13px] text-cream/75">{canStartNew ? <>About <strong className="text-cream-50">{fmtLeft(remaining)}</strong> to wait — pick something fun.</> : "No new games right now — your food needs you soon."}</p>
+                  <p className="mb-3 text-[13px] text-cream/75">
+                    {canStartNew ? (
+                      running && remaining > 0 ? (
+                        <>About <strong className="text-cream-50">{fmtLeft(remaining)}</strong> to wait — pick something fun.</>
+                      ) : (
+                        <>Take a fun break with quick food games while cooking.</>
+                      )
+                    ) : (
+                      "No new games right now — your food needs you soon."
+                    )}
+                  </p>
+                  {safety.level !== "passive" && (
+                    <div className="mb-3 flex items-center gap-2 rounded-xl border border-amber-400/30 bg-amber-500/15 px-3 py-1.5 text-xs text-amber-200">
+                      <span>⚠️</span>
+                      <span>Active step ({safety.reason || "hands-on"}) — keep an eye on your pan while playing!</span>
+                    </div>
+                  )}
                   <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
                     {ACTIVITIES.map((a, i) => {
                       const Icon = ICONS[a.id];
-                      const ok = canStartNew && canStart(a.id, remaining);
+                      const ok = canStartNew && (!running || remaining <= 0 || canStart(a.id, remaining));
                       const best = ok && rec.includes(a.id);
                       return (
                         <motion.button
@@ -334,7 +350,7 @@ export function CookAndChill({ open, onClose, onAskMate, recipe, stepIndex, step
                           <span className="relative text-[12px] font-bold leading-tight sm:text-[13px]">{a.title}</span>
                           <span className="relative hidden text-[11px] leading-snug text-cream/60 sm:block">{a.blurb}</span>
                           {best && <span className="relative rounded-full bg-cream/90 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-forest">Good fit</span>}
-                          {!ok && canStartNew && <span className="relative text-[9px] font-semibold text-cream/60">needs ~{fmtLeft(a.minSeconds)}</span>}
+                          {!ok && canStartNew && running && remaining > 0 && <span className="relative text-[9px] font-semibold text-cream/60">needs ~{fmtLeft(a.minSeconds)}</span>}
                         </motion.button>
                       );
                     })}

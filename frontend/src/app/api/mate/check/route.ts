@@ -10,7 +10,7 @@ import { synthesize, ttsProvider } from "@/lib/tts-server";
  */
 export const dynamic = "force-dynamic";
 
-const MODELS = ["gemini-3.6-flash", "gemini-3.5-flash-lite", "gemini-flash-latest", "gemini-3.8-flash"];
+const MODELS = ["gemini-3.5-flash-lite", "gemini-flash-lite-latest", "gemini-flash-latest", "gemini-3.6-flash", "gemini-3.8-flash"];
 
 async function fullTest(key: string, model: string, thinking: Record<string, unknown> | null) {
   const catalog = RECIPES.map((r) => `${r.id} | ${r.name} | ${r.cuisine}`).join("\n");

@@ -71,7 +71,7 @@ const SCHEMAS: Record<ChillRequest["activity"], { schema: object; keys: string }
   song: { keys: "title, style, lines[]", schema: { type: "OBJECT", properties: { title: STR, style: STR, lines: ARR_STR }, required: ["title", "style", "lines"] } },
 };
 
-const avoid = (recent: string[]) => (recent.length ? ` Do NOT repeat any of these recent items: ${recent.slice(0, 15).map((r) => `"${clip(r, 90)}"`).join("; ")}.` : "");
+const avoid = (recent?: string[]) => (recent && recent.length ? ` Do NOT repeat any of these recent items: ${recent.slice(0, 15).map((r) => `"${clip(r, 90)}"`).join("; ")}.` : "");
 
 /** The single user turn that asks for this activity. */
 function instruction(r: ChillRequest, c: ChillContext): { text: string; temperature: number; history?: { who: "user" | "mate"; text: string }[] } {
@@ -145,8 +145,8 @@ export async function POST(req: Request) {
   const { schema, keys } = SCHEMAS[r.activity];
   try {
     const out = p.kind === "gemini"
-      ? await callGemini(p.key, system(c), history, { schema, temperature: ins.temperature, maxTokens: 1024, budgetMs: 20_000 })
-      : await callClaude(p.key, system(c), history, { jsonHint: `Respond with ONLY a JSON object with keys: ${keys}.`, maxTokens: 800, temperature: ins.temperature, budgetMs: 20_000 });
+      ? await callGemini(p.key, system(c), history, { schema, temperature: ins.temperature, maxTokens: 1024, budgetMs: 16_000 })
+      : await callClaude(p.key, system(c), history, { jsonHint: `Respond with ONLY a JSON object with keys: ${keys}.`, maxTokens: 800, temperature: ins.temperature, budgetMs: 16_000 });
     const data = validate(r, c, extractJson(out.text));
     if (!data) {
       console.error(`[chill] ${r.activity}: model output failed validation`);

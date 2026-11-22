@@ -123,8 +123,9 @@ export default function CookPage() {
         <Link href={`/recipes/${r.id}`} className="flex items-center gap-2 rounded-full bg-cream/10 px-4 py-2 text-sm font-semibold hover:bg-cream/20"><X className="h-4 w-4" /> Exit</Link>
         <p className="hidden font-display text-lg sm:block">{r.emoji} {r.name}</p>
         <div className="flex gap-2">
-          <button onClick={() => setPanel(panel === "list" ? null : "list")} className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${panel === "list" ? "bg-cream text-forest" : "bg-cream/10 hover:bg-cream/20"}`} aria-pressed={panel === "list"}><ListChecks className="h-4 w-4" /> <span className="hidden sm:inline">Ingredients</span></button>
-          <button onClick={() => setPanel(panel === "mate" ? null : "mate")} className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${panel === "mate" ? "bg-cream text-forest" : "bg-cream/10 hover:bg-cream/20"}`} aria-pressed={panel === "mate"}><MessageCircle className="h-4 w-4" /> <span className="hidden sm:inline">Cooking Mate</span></button>
+          <button onClick={() => setPanel(panel === "list" ? null : "list")} className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${panel === "list" ? "bg-cream text-forest" : "bg-cream/10 hover:bg-cream/20"}`} aria-pressed={panel === "list"}><ListChecks className="h-4 w-4" /> <span className="hidden sm:inline">Ingredients</span></button>
+          <button onClick={() => setPanel(panel === "mate" ? null : "mate")} className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${panel === "mate" ? "bg-cream text-forest" : "bg-cream/10 hover:bg-cream/20"}`} aria-pressed={panel === "mate"}><MessageCircle className="h-4 w-4" /> <span className="hidden sm:inline">Cooking Mate</span></button>
+          <button onClick={() => { setPanel(panel === "chill" ? null : "chill"); setChillUsed(true); }} className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${panel === "chill" ? "bg-cream text-forest" : "bg-cream/10 hover:bg-cream/20"}`} aria-pressed={panel === "chill"}><Sparkles className="h-4 w-4" /> <span className="hidden sm:inline">Cook &amp; Chill</span></button>
         </div>
       </header>
 

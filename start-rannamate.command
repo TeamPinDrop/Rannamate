@@ -33,4 +33,4 @@ fi
 
 echo "→ Starting website on http://localhost:3000 …"
 (sleep 6; open "http://localhost:3000") &
-npm --prefix frontend run dev -- -p 3000
+npm --prefix frontend run dev

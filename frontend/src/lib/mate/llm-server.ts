@@ -4,14 +4,20 @@
  * never sent to the browser.
  */
 
-// Fast, reliable model first; others are fallbacks. A model that is slow or unreachable is skipped.
-const GEMINI_MODELS = ["gemini-3.6-flash", "gemini-3.5-flash-lite", "gemini-flash-latest", "gemini-3.8-flash"];
-const FIRST_TRY_MS = 18_000;
+// Fast, reliable models first; others are fallbacks. A model that is slow or unreachable is skipped quickly.
+const GEMINI_MODELS = [
+  "gemini-flash-lite-latest",
+  "gemini-3.5-flash-lite",
+  "gemini-3.1-flash-lite",
+  "gemini-flash-latest",
+  "gemini-3.8-flash",
+];
+const FIRST_TRY_MS = 8_000;
 /** Models that told us their quota is used up are skipped until this time (ms). */
 const cooledUntil = new Map<string, number>();
-const NEXT_TRY_MS = 10_000;
-/** Whole request must finish well before the browser gives up (35 s). */
-const BUDGET_MS = 28_000;
+const NEXT_TRY_MS = 5_000;
+/** Whole request must finish well before the browser gives up (18 s). */
+const BUDGET_MS = 18_000;
 
 export type LlmHistory = { who: "user" | "mate"; text: string }[];
 
@@ -39,7 +45,7 @@ export async function callGemini(
   for (const [i, model] of (usable.length ? usable : models).entries()) {
     for (let attempt = 0; attempt < 2; attempt++) {
       const left = Math.min(deadline - Date.now(), i === 0 && attempt === 0 ? FIRST_TRY_MS : NEXT_TRY_MS);
-      if (left < 3000) throw new Error(lastErr === "ai_error" ? "Gemini took too long to answer" : lastErr);
+      if (left < 2000) throw new Error(lastErr === "ai_error" ? "Gemini took too long to answer" : lastErr);
       const t0 = Date.now();
       let res: Response;
       try {
@@ -52,11 +58,11 @@ export async function callGemini(
             contents,
             generationConfig: {
               temperature: opts.temperature ?? 0.8,
-              maxOutputTokens: opts.maxTokens ?? 4096,
+              maxOutputTokens: opts.maxTokens ?? 1500,
               responseMimeType: "application/json",
               responseSchema: opts.schema,
               // Gemini 3.x "thinks" before answering; a low level keeps replies fast for a voice chat
-              ...(model.startsWith("gemini-3") && attempt === 0 ? { thinkingConfig: { thinkingLevel: "low" } } : {}),
+              ...(model.startsWith("gemini-3") ? { thinkingConfig: { thinkingLevel: "low" } } : {}),
             },
           }),
         });
